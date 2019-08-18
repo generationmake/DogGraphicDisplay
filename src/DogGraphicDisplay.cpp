@@ -12,7 +12,7 @@
 #include <SPI.h>
 #include <avr/pgmspace.h>
 
-#include "dog_7565R.h"
+#include "DogGraphicDisplay.h"
 
 
 #define INITLEN 14
