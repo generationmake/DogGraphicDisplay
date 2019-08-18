@@ -10,7 +10,9 @@
 
 #include <Arduino.h>
 #include <SPI.h>
+#if defined(ARDUINO_ARCH_AVR)
 #include <avr/pgmspace.h>
+#endif
 
 #include "DogGraphicDisplay.h"
 
@@ -135,16 +137,19 @@ void dog_7565R::string(byte column, byte page, const byte *font_adress, const ch
 
 	
 	
+#if defined(ARDUINO_ARCH_AVR)
 	start_code 	 = pgm_read_byte(&font_adress[2]);  //get first defined character
 	last_code	 = pgm_read_byte(&font_adress[3]);  //get last defined character
 	width		 = pgm_read_byte(&font_adress[4]);  //width in pixel of one char
 	page_height  = pgm_read_byte(&font_adress[6]);  //page count per char
 	bytes_p_char = pgm_read_byte(&font_adress[7]);  //bytes per char
-//	start_code 	 = font_adress[2];  //get first defined character
-//	last_code	 = font_adress[3];  //get last defined character
-//	width		 = font_adress[4];  //width in pixel of one char
-//	page_height  = font_adress[6];  //page count per char
-//	bytes_p_char = font_adress[7];  //bytes per char
+#else
+	start_code 	 = font_adress[2];  //get first defined character
+	last_code	 = font_adress[3];  //get last defined character
+	width		 = font_adress[4];  //width in pixel of one char
+	page_height  = font_adress[6];  //page count per char
+	bytes_p_char = font_adress[7];  //bytes per char
+#endif
   
   if(type != DOGM132 && page_height + page > 8) //stay inside display area
 		page_height = 8 - page;
@@ -181,8 +186,11 @@ void dog_7565R::string(byte column, byte page, const byte *font_adress, const ch
           
 				for(x=0; x < width_max; x++) //print the whole string
 				{
+#if defined(ARDUINO_ARCH_AVR)
 					spi_out(pgm_read_byte(&font_adress[pos_array+x]));
-//					spi_out(font_adress[pos_array+x]);
+#else
+					spi_out(font_adress[pos_array+x]);
+#endif
 					//spi_out(pgm_read_byte(&font_adress[pos_array+x])); //double width font (bold)
 				}
 			}
@@ -206,16 +214,19 @@ void dog_7565R::stringx(byte column, byte page, int offset, const byte *font_adr
 
 	
 	
+#if defined(ARDUINO_ARCH_AVR)
 	start_code 	 = pgm_read_byte(&font_adress[2]);  //get first defined character
 	last_code	 = pgm_read_byte(&font_adress[3]);  //get last defined character
 	width		 = pgm_read_byte(&font_adress[4]);  //width in pixel of one char
 	page_height  = pgm_read_byte(&font_adress[6]);  //page count per char
 	bytes_p_char = pgm_read_byte(&font_adress[7]);  //bytes per char
-//	start_code 	 = font_adress[2];  //get first defined character
-//	last_code	 = font_adress[3];  //get last defined character
-//	width		 = font_adress[4];  //width in pixel of one char
-//	page_height  = font_adress[6];  //page count per char
-//	bytes_p_char = font_adress[7];  //bytes per char
+#else
+	start_code 	 = font_adress[2];  //get first defined character
+	last_code	 = font_adress[3];  //get last defined character
+	width		 = font_adress[4];  //width in pixel of one char
+	page_height  = font_adress[6];  //page count per char
+	bytes_p_char = font_adress[7];  //bytes per char
+#endif
   
   if(type != DOGM132 && page_height + page > 8) //stay inside display area
 		page_height = 8 - page;
@@ -264,8 +275,11 @@ columnx=column+offset;
           
 				for(x=width_min; x < width_max; x++) //print the whole string
 				{
+#if defined(ARDUINO_ARCH_AVR)
 					spi_out(pgm_read_byte(&font_adress[pos_array+x]));
-//					spi_out(font_adress[pos_array+x]);
+#else
+					spi_out(font_adress[pos_array+x]);
+#endif
 					//spi_out(pgm_read_byte(&font_adress[pos_array+x])); //double width font (bold)
 				}
 				column_cnt+=width;
@@ -317,10 +331,13 @@ void dog_7565R::picture(byte column, byte page, const byte *pic_adress)
 	unsigned int byte_cnt = 2;
 	byte width, page_cnt;
 		
+#if defined(ARDUINO_ARCH_AVR)
 	width = pgm_read_byte(&pic_adress[0]);
 	page_cnt = (pgm_read_byte(&pic_adress[1]) + 7) / 8; //height in pages, add 7 and divide by 8 for getting the used pages (byte boundaries)
-//	width = pic_adress[0];
-//	page_cnt = (pic_adress[1] + 7) / 8; //height in pages, add 7 and divide by 8 for getting the used pages (byte boundaries)
+#else
+	width = pic_adress[0];
+	page_cnt = (pic_adress[1] + 7) / 8; //height in pages, add 7 and divide by 8 for getting the used pages (byte boundaries)
+#endif
 	     
   if(width + column > 128 && type != DOGM132) //stay inside display area
 		width = 128 - column;
@@ -339,8 +356,11 @@ void dog_7565R::picture(byte column, byte page, const byte *pic_adress)
 		digitalWrite(p_cs, LOW);
 		
 		for(c=0; c<width; c++)
-//			spi_out(pic_adress[byte_cnt++]);
+#if defined(ARDUINO_ARCH_AVR)
 			spi_out(pgm_read_byte(&pic_adress[byte_cnt++]));
+#else
+			spi_out(pic_adress[byte_cnt++]);
+#endif
 		
 		digitalWrite(p_cs, HIGH);
 	}
