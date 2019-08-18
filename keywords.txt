@@ -1,0 +1,30 @@
+#######################################
+# Syntax Coloring Map DOGM-Graphic
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+dog_7565R	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+initialize	KEYWORD2
+clear	KEYWORD2       
+contrast	KEYWORD2        
+view	KEYWORD2
+string	KEYWORD2
+rectangle	KEYWORD2  
+picture	KEYWORD2     
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+DOGM128	LITERAL1
+DOGL128	LITERAL1
+DOGM132	LITERAL1
+VIEW_BOTTOM	LITERAL1
+VIEW_TOP	LITERAL1
