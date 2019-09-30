@@ -21,6 +21,8 @@
 byte init_DOGM128[INITLEN] = {0x40, 0xA1, 0xC0, 0xA6, 0xA2, 0x2F, 0xF8, 0x00, 0x27, 0x81, 0x16, 0xAC, 0x00, 0xAF};
 byte init_DOGL128[INITLEN] = {0x40, 0xA1, 0xC0, 0xA6, 0xA2, 0x2F, 0xF8, 0x00, 0x27, 0x81, 0x10, 0xAC, 0x00, 0xAF}; 
 byte init_DOGM132[INITLEN] = {0x40, 0xA1, 0xC0, 0xA6, 0xA2, 0x2F, 0xF8, 0x00, 0x23, 0x81, 0x1F, 0xAC, 0x00, 0xAF};
+#define INITLEN_DOGS102 13
+byte init_DOGS102[INITLEN_DOGS102] = {0x40, 0xA1, 0xC0, 0xA4, 0xA6, 0xA2, 0x2F, 0x27, 0x81, 0x10, 0xFA, 0x90, 0xAF};
 
 //----------------------------------------------------public Functions----------------------------------------------------
 //Please use these functions in your sketch
@@ -30,12 +32,12 @@ Func: DOG-INIT
 Desc: Initializes SPI Hardware/Software and DOG Displays
 Vars: CS-Pin, MOSI-Pin, SCK-Pin (MOSI=SCK Hardware else Software), A0-Pin (high=data, low=command), p_res = Reset-Pin, type (1=EA DOGM128-6, 2=EA DOGL128-6)
 ------------------------------*/
-void dog_7565R::initialize(byte p_cs, byte p_si, byte p_clk, byte p_a0, byte p_res, byte type) 
+void dogGraphicDisplay::initialize(byte p_cs, byte p_si, byte p_clk, byte p_a0, byte p_res, byte type) 
 {
 	byte *ptr_init; //pointer to the correct init values
 	top_view = false; //default = bottom view
 
-	dog_7565R::p_a0 = p_a0;
+	dogGraphicDisplay::p_a0 = p_a0;
 	pinMode(p_a0, OUTPUT);
 	spi_initialize(p_cs, p_si, p_clk); //init SPI to Mode 3
 
@@ -51,11 +53,13 @@ void dog_7565R::initialize(byte p_cs, byte p_si, byte p_clk, byte p_a0, byte p_r
 	if(type == DOGM128) 		ptr_init = init_DOGM128;
 	else if(type == DOGL128) 	ptr_init = init_DOGL128;
 	else if(type == DOGM132) 	ptr_init = init_DOGM132;
+	else if(type == DOGS102) 	ptr_init = init_DOGS102;
 	
-	dog_7565R::type = type;
+	dogGraphicDisplay::type = type;
 
 	digitalWrite(p_a0, LOW); //init display
-	spi_put(ptr_init, INITLEN);
+	if(type == DOGS102) spi_put(ptr_init, INITLEN_DOGS102);	// shorter init for DOGS102
+	else spi_put(ptr_init, INITLEN);
 
 	clear();
 }
@@ -65,7 +69,7 @@ Func: clear_display
 Desc: clears the entire DOG-Display
 Vars: ---
 ------------------------------*/
-void dog_7565R::clear(void) 
+void dogGraphicDisplay::clear(void) 
 {
 	byte page, column;
 	byte page_cnt = 8, column_cnt = 128;
@@ -74,6 +78,11 @@ void dog_7565R::clear(void)
 	{
 		page_cnt = 4;
 		column_cnt = 132;
+	}
+	if(type == DOGS102)		// define different parameters for DOGS102
+	{
+		page_cnt = 8;
+		column_cnt = 102;
 	}
 	
 	for(page = 0; page < page_cnt; page++) //Display has 8 pages
@@ -94,7 +103,7 @@ Func: contrast
 Desc: sets contrast to the DOG-Display
 Vars: byte contrast (0..63)
 ------------------------------*/
-void dog_7565R::contrast(byte contr) 
+void dogGraphicDisplay::contrast(byte contr) 
 {
 	command(0x81);   		//double byte command
 	command(contr&0x3F);	//contrast has only 6 bits
@@ -105,7 +114,7 @@ Func: view
 Desc: ssets the display viewing direction
 Vars: direction (top view 0xC8, bottom view (default) = 0xC0)
 ------------------------------*/
-void dog_7565R::view(byte direction)  
+void dogGraphicDisplay::view(byte direction)  
 {
 	if(direction == VIEW_TOP)
 	{
@@ -128,7 +137,7 @@ Func: string
 Desc: shows string with selected font on position
 Vars: column (0..127/131), page(0..3/7),  font adress in programm memory, stringarray
 ------------------------------*/
-void dog_7565R::string(byte column, byte page, const byte *font_adress, const char *str)
+void dogGraphicDisplay::string(byte column, byte page, const byte *font_adress, const char *str)
 {
 	unsigned int pos_array; 										//Postion of character data in memory array
 	byte x, y, column_cnt, width_max;								//temporary column and page adress, couloumn_cnt tand width_max are used to stay inside display area
@@ -177,10 +186,12 @@ void dog_7565R::string(byte column, byte page, const byte *font_adress, const ch
 				pos_array = 8 + (unsigned int)(*string++ - start_code) * bytes_p_char;
 				pos_array += y*width; //get the dot pattern for the part of the char to print
         
-        if(type != DOGM132 && column_cnt + width > 128) //stay inside display area
-					width_max = 128-column_cnt;
+        if(type != DOGM132 && type != DOGS102 && column_cnt + width > 128) //stay inside display area
+		width_max = 128-column_cnt;
         else if(type == DOGM132 && column_cnt + width > 132)
            width_max = 132-column_cnt;
+        else if(type == DOGS102 && column_cnt + width > 102)
+           width_max = 102-column_cnt;
 				else
 					width_max = width;
           
@@ -204,7 +215,7 @@ Func: stringx with offset
 Desc: shows string with selected font on position
 Vars: column (0..127/131), page(0..3/7),  font adress in programm memory, stringarray
 ------------------------------*/
-void dog_7565R::stringx(byte column, byte page, int offset, const byte *font_adress, const char *str)
+void dogGraphicDisplay::stringx(byte column, byte page, int offset, const byte *font_adress, const char *str)
 {
 	unsigned int pos_array; 										//Postion of character data in memory array
 	byte x, y, width_max,width_min;								//temporary column and page adress, couloumn_cnt tand width_max are used to stay inside display area
@@ -264,10 +275,12 @@ columnx=column+offset;
 				pos_array = 8 + (unsigned int)(*string++ - start_code) * bytes_p_char;
 				pos_array += y*width; //get the dot pattern for the part of the char to print
         
-        if(type != DOGM132 && column_cnt + width > 128) //stay inside display area
+        if(type != DOGM132 && type != DOGS102 && column_cnt + width > 128) //stay inside display area
 					width_max = 128-column_cnt;
         else if(type == DOGM132 && column_cnt + width > 132)
            width_max = 132-column_cnt;
+        else if(type == DOGS102 && column_cnt + width > 102)
+           width_max = 102-column_cnt;
 				else
 					width_max = width;
 				if(column_cnt<0) width_min=0-column_cnt;
@@ -294,14 +307,16 @@ Func: rectangle
 Desc: shows a pattern filled rectangle on the display
 Vars: start and end column (0..127/131) and page(0..3/7), bit pattern
 ------------------------------*/
-void dog_7565R::rectangle(byte start_column, byte start_page, byte end_column, byte end_page, byte pattern)  
+void dogGraphicDisplay::rectangle(byte start_column, byte start_page, byte end_column, byte end_page, byte pattern)  
 {
 	byte x, y;
   
-  if(type != DOGM132 && end_column > 128) //stay inside display area
+  if(type != DOGM132 && type != DOGS102 && end_column > 128) //stay inside display area
 		end_column = 128;
   else if(type == DOGM132 && end_column > 132)
      end_column = 132;
+  else if(type == DOGS102 && end_column > 102)
+     end_column = 102;
 	if(type != DOGM132 && end_page > 7)
 		end_page = 7;
   else if (type == DOGM132 && end_page > 3)
@@ -325,7 +340,7 @@ Func: picture
 Desc: shows a BLH-picture on the display (see BitMapEdit EA LCD-Tools (http://www.lcd-module.de/support.html))
 Vars: column (0..127/131) and page(0..3/7), program memory adress of data
 ------------------------------*/
-void dog_7565R::picture(byte column, byte page, const byte *pic_adress)  
+void dogGraphicDisplay::picture(byte column, byte page, const byte *pic_adress)  
 {
 	byte c,p;
 	unsigned int byte_cnt = 2;
@@ -339,10 +354,12 @@ void dog_7565R::picture(byte column, byte page, const byte *pic_adress)
 	page_cnt = (pic_adress[1] + 7) / 8; //height in pages, add 7 and divide by 8 for getting the used pages (byte boundaries)
 #endif
 	     
-  if(width + column > 128 && type != DOGM132) //stay inside display area
+  if(width + column > 128 && type != DOGM132 && type != DOGS102) //stay inside display area
 		width = 128 - column;
   else if(width + column > 132 && type == DOGM132)
     width = 132 - column;
+  else if(width + column > 102 && type == DOGS102)
+    width = 102 - column;
   
   if(type != DOGM132 && page_cnt + page > 8)
 		page_cnt = 8 - page;
@@ -374,7 +391,7 @@ Func: position
 Desc: sets write pointer in DOG-Display
 Vars: column (0..127/131), page(0..3/7)
 ------------------------------*/
-void dog_7565R::position(byte column, byte page)  
+void dogGraphicDisplay::position(byte column, byte page)  
 {
 	if(top_view && type != DOGM132)
 		column += 4;
@@ -389,7 +406,7 @@ Func: command
 Desc: Sends a command to the DOG-Display
 Vars: data
 ------------------------------*/
-void dog_7565R::command(byte dat) 
+void dogGraphicDisplay::command(byte dat) 
 {
 	digitalWrite(p_a0, LOW);
 	spi_put_byte(dat);
@@ -400,7 +417,7 @@ Func: data
 Desc: Sends data to the DOG-Display
 Vars: data
 ------------------------------*/
-void dog_7565R::data(byte dat) 
+void dogGraphicDisplay::data(byte dat) 
 {
 	 digitalWrite(p_a0, HIGH);
 	 spi_put_byte(dat);
@@ -411,7 +428,7 @@ Func: spi_initialize
 Desc: Initializes SPI Hardware/Software
 Vars: CS-Pin, MOSI-Pin, SCK-Pin (MOSI=SCK Hardware else Software)
 ------------------------------*/
-void dog_7565R::spi_initialize(byte cs, byte si, byte clk) 
+void dogGraphicDisplay::spi_initialize(byte cs, byte si, byte clk) 
 {
 	//Set pin Configuration
 	p_cs = cs;
@@ -453,7 +470,7 @@ Func: spi_put_byte
 Desc: Sends one Byte using CS
 Vars: data
 ------------------------------*/
-void dog_7565R::spi_put_byte(byte dat) 
+void dogGraphicDisplay::spi_put_byte(byte dat) 
 {
 	digitalWrite(p_cs, LOW);
 	spi_out(dat);
@@ -465,7 +482,7 @@ Func: spi_put
 Desc: Sends bytes using CS
 Vars: ptr to data and len
 ------------------------------*/
-void dog_7565R::spi_put(byte *dat, int len) 
+void dogGraphicDisplay::spi_put(byte *dat, int len) 
 {
 	digitalWrite(p_cs, LOW);
 	do
@@ -481,7 +498,7 @@ Func: spi_out
 Desc: Sends one Byte, no CS
 Vars: data
 ------------------------------*/
-void dog_7565R::spi_out(byte dat) 
+void dogGraphicDisplay::spi_out(byte dat) 
 {
 	byte i = 8;
 	if(hardware) 

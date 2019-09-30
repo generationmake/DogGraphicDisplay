@@ -6,7 +6,7 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-dog_7565R	KEYWORD1
+dogGraphicDisplay	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
@@ -26,5 +26,6 @@ picture	KEYWORD2
 DOGM128	LITERAL1
 DOGL128	LITERAL1
 DOGM132	LITERAL1
+DOGS102	LITERAL1
 VIEW_BOTTOM	LITERAL1
 VIEW_TOP	LITERAL1

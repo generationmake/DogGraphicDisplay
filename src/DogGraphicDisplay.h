@@ -8,19 +8,20 @@
  * published by the Free Software Foundation.
  */
 
-#ifndef DOG_7565R_H
-#define DOG_7565R_H
+#ifndef DOGGRAPHICDISPLAY_H
+#define DOGGRAPHICDISPLAY_H
 
 
 #define DOGM128 1
 #define DOGL128 2
 #define DOGM132 3
+#define DOGS102 4
 
 #define VIEW_BOTTOM 0xC0
 #define VIEW_TOP 	0xC8
 
 
-class dog_7565R
+class dogGraphicDisplay
 {
   public:
     void initialize     (byte p_cs, byte p_si, byte p_clk, byte p_a0, byte p_res, byte type);
@@ -51,4 +52,4 @@ class dog_7565R
 	void spi_out		(byte dat);
 };
 
-#endif
+#endif /* DOGGRAPHICDISPLAY_H */
