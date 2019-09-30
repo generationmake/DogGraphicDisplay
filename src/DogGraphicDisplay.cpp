@@ -1,11 +1,15 @@
 /*
+ * Copyright (c) 2019 by generationmake bernhard@generationmake.de
+ * Arduino library for Electronic Assembly Dog Graphic Display DOGM132-5, DOGM128-6, DOGL128-6 and DOGS102-6 (controller ST7565 and UC1701)
+ *
+ * based on the work by:
  * Copyright (c) 2014 by ELECTRONIC ASSEMBLY <technik@lcd-module.de>
  * EA DOG Graphic (ST7565R) software library for arduino.
+ * (see git log for modifications)
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of either the GNU General Public License version 2
- * or the GNU Lesser General Public License version 2.1, both as
- * published by the Free Software Foundation.
+ * it under the terms of the GNU Lesser General Public License version 2.1,
+ * as published by the Free Software Foundation.
  */
 
 #include <Arduino.h>
