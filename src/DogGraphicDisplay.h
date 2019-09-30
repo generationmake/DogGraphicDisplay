@@ -21,6 +21,10 @@
 #define DOGM132 3
 #define DOGS102 4
 
+#define ALIGN_LEFT 1
+#define ALIGN_RIGHT 2
+#define ALIGN_CENTER 3
+
 #define VIEW_BOTTOM 0xC0
 #define VIEW_TOP 	0xC8
 
@@ -36,6 +40,7 @@ class dogGraphicDisplay
 	void inverse		(bool state);
 	void sleep		(bool state);
 	void string         (byte column, byte page, const byte *font_adress, const char *str);
+	void string         (byte column, byte page, const byte *font_adress, const char *str, byte align);
 	void stringx         (byte column, byte page, int offset, const byte *font_adress, const char *str);
 	void rectangle		(byte start_column, byte start_page, byte end_column, byte end_page, byte pattern);
 	void picture		(byte column, byte page, const byte *pic_adress);
