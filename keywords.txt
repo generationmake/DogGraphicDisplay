@@ -15,6 +15,9 @@ initialize	KEYWORD2
 clear	KEYWORD2       
 contrast	KEYWORD2        
 view	KEYWORD2
+all_pixel_on	KEYWORD2
+inverse	KEYWORD2
+sleep	KEYWORD2
 string	KEYWORD2
 rectangle	KEYWORD2  
 picture	KEYWORD2     

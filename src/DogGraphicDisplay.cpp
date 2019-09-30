@@ -137,6 +137,57 @@ void dogGraphicDisplay::view(byte direction)
 }
 
 /*----------------------------
+Func: all_pixel_on
+Desc: sets all pixel of the display to on
+Vars: state (false=show SRAM content, true=set all pixel to on)
+------------------------------*/
+void dogGraphicDisplay::all_pixel_on(bool state)  
+{
+	if(state == false)
+	{
+		command(0xA4);	// normal mode
+	}
+	else
+	{
+		command(0xA5);	// all pixels on
+	}
+}
+
+/*----------------------------
+Func: inverse
+Desc: inverse content of display
+Vars: state (false=normal content, true=inverse content)
+------------------------------*/
+void dogGraphicDisplay::inverse(bool state)  
+{
+	if(state == false)
+	{
+		command(0xA6);	// normal mode
+	}
+	else
+	{
+		command(0xA7);	// inverse mode
+	}
+}
+
+/*----------------------------
+Func: sleep
+Desc: sends the display to sleep mode (on/off)
+Vars: state (false=normal mode, true=sleep mode)
+------------------------------*/
+void dogGraphicDisplay::sleep(bool state)  
+{
+	if(state == false)
+	{
+		command(0xAF);	// normal mode
+	}
+	else
+	{
+		command(0xAE);	// sleep mode
+	}
+}
+
+/*----------------------------
 Func: string
 Desc: shows string with selected font on position
 Vars: column (0..127/131), page(0..3/7),  font adress in programm memory, stringarray
