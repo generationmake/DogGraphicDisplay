@@ -369,6 +369,135 @@ void dogGraphicDisplay::string(byte column, byte page, const byte *font_adress, 
 }
 
 /*----------------------------
+Func: string
+Desc: shows string with selected font on position with align and style
+Vars: column (0..127/131), page(0..3/7),  font adress in programm memory, stringarray, align, style
+------------------------------*/
+void dogGraphicDisplay::string(byte column, byte page, const byte *font_adress, const char *str, byte align, byte style)
+{
+	unsigned int pos_array; 		//Postion of character data in memory array
+	byte x, y, column_cnt, width_max;	//temporary column and page adress, couloumn_cnt tand width_max are used to stay inside display area
+	byte start_code, last_code, width, page_height, bytes_p_char;	//font information, needed for calculation
+	const char *string;
+	int stringwidth=0; // width of string in pixels
+	int column_total = 128;
+
+#if defined(ARDUINO_ARCH_AVR)
+	start_code 	 = pgm_read_byte(&font_adress[2]);  //get first defined character
+	last_code	 = pgm_read_byte(&font_adress[3]);  //get last defined character
+	width		 = pgm_read_byte(&font_adress[4]);  //width in pixel of one char
+	page_height  = pgm_read_byte(&font_adress[6]);  //page count per char
+	bytes_p_char = pgm_read_byte(&font_adress[7]);  //bytes per char
+#else
+	start_code 	 = font_adress[2];  //get first defined character
+	last_code	 = font_adress[3];  //get last defined character
+	width		 = font_adress[4];  //width in pixel of one char
+	page_height  = font_adress[6];  //page count per char
+	bytes_p_char = font_adress[7];  //bytes per char
+#endif
+
+	string = str;             //temporary pointer to the beginning of the string to print
+	while(*string != 0)
+	{
+		if((byte)*string < start_code || (byte)*string > last_code) //make sure data is valid
+			string++;
+		else
+		{
+			string++;
+			stringwidth++;
+		}
+	}
+	stringwidth*=width;
+  
+  if(type != DOGM132 && page_height + page > 8) //stay inside display area
+		page_height = 8 - page;
+  else  if(type == DOGM132 && page_height + page > 4)
+    page_height = 4 - page;
+
+	
+	if(type == DOGM132)
+		column_total = 132;
+	if(type == DOGS102)		// define different parameters for DOGS102
+		column_total = 102;
+
+	if(align==ALIGN_RIGHT) 
+	{
+		if(column==0) column=column_total-stringwidth;
+		else column=column-stringwidth;
+	}
+	if(align==ALIGN_CENTER) column=(column_total-stringwidth)/2;
+  	
+	//The string is displayed character after character. If the font has more then one page, 
+	//the top page is printed first, then the next page and so on
+	for(y = 0; y < page_height; y++)
+	{
+		if(style==STYLE_FULL || style==STYLE_FULL_INVERSE)
+		{
+			
+			position(0, page+y); //set startpositon and page
+			column_cnt=0;
+			digitalWrite(p_a0, HIGH);
+			digitalWrite(p_cs, LOW);
+			while(column_cnt<column)
+			{
+				column_cnt++;
+				if(style==STYLE_FULL_INVERSE) spi_out(0xFF);
+				else spi_out(0);
+			}
+		}
+		else position(column, page+y); //set startpositon and page
+		column_cnt = column; //store column for display last column check
+		string = str;             //temporary pointer to the beginning of the string to print
+		digitalWrite(p_a0, HIGH);
+		digitalWrite(p_cs, LOW);
+		while(*string != 0)
+		{	
+			if((byte)*string < start_code || (byte)*string > last_code) //make sure data is valid
+				string++;
+			else
+			{							
+				//calculate positon of ascii character in font array
+				//bytes for header + (ascii - startcode) * bytes per char)
+				pos_array = 8 + (unsigned int)(*string++ - start_code) * bytes_p_char;
+				pos_array += y*width; //get the dot pattern for the part of the char to print
+        
+        if(type != DOGM132 && type != DOGS102 && column_cnt + width > 128) //stay inside display area
+		width_max = 128-column_cnt;
+        else if(type == DOGM132 && column_cnt + width > 132)
+           width_max = 132-column_cnt;
+        else if(type == DOGS102 && column_cnt + width > 102)
+           width_max = 102-column_cnt;
+				else
+					width_max = width;
+          
+				for(x=0; x < width_max; x++) //print the whole string
+				{
+#if defined(ARDUINO_ARCH_AVR)
+					if(style==STYLE_INVERSE || style==STYLE_FULL_INVERSE) spi_out(~pgm_read_byte(&font_adress[pos_array+x]));
+					else spi_out(pgm_read_byte(&font_adress[pos_array+x]));
+#else
+					if(style==STYLE_INVERSE || style==STYLE_FULL_INVERSE) spi_out(~font_adress[pos_array+x]);
+					else spi_out(font_adress[pos_array+x]);
+#endif
+					//spi_out(pgm_read_byte(&font_adress[pos_array+x])); //double width font (bold)
+				}
+			}
+		}
+		if(style==STYLE_FULL || style==STYLE_FULL_INVERSE)
+		{
+			column_cnt=column+stringwidth;
+			while(column_cnt<column_total)
+			{
+				column_cnt++;
+				if(style==STYLE_FULL_INVERSE) spi_out(0xFF);
+				else spi_out(0);
+			}
+		}
+		digitalWrite(p_cs, HIGH);
+	}
+}
+
+/*----------------------------
 Func: stringx with offset
 Desc: shows string with selected font on position
 Vars: column (0..127/131), page(0..3/7),  font adress in programm memory, stringarray
