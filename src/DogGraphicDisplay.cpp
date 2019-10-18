@@ -341,11 +341,11 @@ Func: stringx with offset
 Desc: shows string with selected font on position
 Vars: column (0..127/131), page(0..3/7),  font adress in programm memory, stringarray
 ------------------------------*/
-void dogGraphicDisplay::stringx(byte column, byte page, int offset, const byte *font_adress, const char *str, byte align, byte style)
+void dogGraphicDisplay::stringx(int column, byte page, const byte *font_adress, const char *str, byte align, byte style)
 {
-	unsigned int pos_array; 										//Postion of character data in memory array
-	byte x, y, width_max,width_min;								//temporary column and page adress, couloumn_cnt tand width_max are used to stay inside display area
-	int column_cnt,columnx;								//temporary column and page adress, couloumn_cnt tand width_max are used to stay inside display area
+	unsigned int pos_array; 	//Postion of character data in memory array
+	byte x, y, width_max,width_min;	//temporary column and page adress, couloumn_cnt tand width_max are used to stay inside display area
+	int column_cnt;			//temporary column and page adress, couloumn_cnt tand width_max are used to stay inside display area
 	byte start_code, last_code, width, page_height, bytes_p_char;	//font information, needed for calculation
 	const char *string;
 	int stringwidth=0; // width of string in pixels
@@ -377,19 +377,17 @@ void dogGraphicDisplay::stringx(byte column, byte page, int offset, const byte *
 	}
 	stringwidth*=width;
   
-  if(type != DOGM132 && page_height + page > 8) //stay inside display area
+	if(type != DOGM132 && page_height + page > 8) //stay inside display area
 		page_height = 8 - page;
-  else  if(type == DOGM132 && page_height + page > 4)
-    page_height = 4 - page;
-
-columnx=column+offset;		// store startposition in columnx
+	else  if(type == DOGM132 && page_height + page > 4)
+		page_height = 4 - page;
 
 	if(align==ALIGN_RIGHT) 
 	{
-		if(columnx==0) columnx=display_width()-stringwidth;
-		else columnx=columnx-stringwidth;
+		if(column==0) column=display_width()-stringwidth;	//if column is 0 align string to the right border
+		else column=column-stringwidth;
 	}
-	if(align==ALIGN_CENTER) columnx=(display_width()-stringwidth)/2;
+	if(align==ALIGN_CENTER) column=(display_width()-stringwidth)/2;
   	
 	//The string is displayed character after character. If the font has more then one page, 
 	//the top page is printed first, then the next page and so on
@@ -402,17 +400,16 @@ columnx=column+offset;		// store startposition in columnx
 			column_cnt=0;
 			digitalWrite(p_a0, HIGH);
 			digitalWrite(p_cs, LOW);
-			while(column_cnt<columnx)
+			while(column_cnt<column)		// fill columns until beginning of string
 			{
 				column_cnt++;
 				if(style==STYLE_FULL_INVERSE) spi_out(0xFF);
 				else spi_out(0);
 			}
 		}
-		else if(columnx<0) position(0,page+y);
-		else position(columnx, page+y); //set startpositon and page
-		column = columnx;
-		column_cnt = columnx; //store column for display last column check
+		else if(column<0) position(0,page+y);
+		else position(column, page+y); //set startpositon and page
+		column_cnt = column; //store column for display last column check
 		string = str;             //temporary pointer to the beginning of the string to print
 		digitalWrite(p_a0, HIGH);
 		digitalWrite(p_cs, LOW);
