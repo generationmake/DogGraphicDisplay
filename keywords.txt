@@ -21,6 +21,7 @@ sleep	KEYWORD2
 string	KEYWORD2
 rectangle	KEYWORD2  
 picture	KEYWORD2     
+display_width	KEYWORD2     
 
 
 #######################################

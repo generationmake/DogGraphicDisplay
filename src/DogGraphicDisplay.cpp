@@ -369,18 +369,19 @@ void dogGraphicDisplay::picture(byte column, byte page, const byte *pic_adress)
 {
 	byte c,p;
 	unsigned int byte_cnt = 2;
-	byte width, page_cnt;
+	byte width,picture_width, page_cnt;
 		
 #if defined(ARDUINO_ARCH_AVR)
-	width = pgm_read_byte(&pic_adress[0]);
+	picture_width = pgm_read_byte(&pic_adress[0]);
 	page_cnt = (pgm_read_byte(&pic_adress[1]) + 7) / 8; //height in pages, add 7 and divide by 8 for getting the used pages (byte boundaries)
 #else
-	width = pic_adress[0];
+	picture_width = pic_adress[0];
 	page_cnt = (pic_adress[1] + 7) / 8; //height in pages, add 7 and divide by 8 for getting the used pages (byte boundaries)
 #endif
 	     
-	if(width + column > display_width()) //stay inside display area
+	if((picture_width + column) > display_width()) //stay inside display area
 		width = display_width() - column;
+	else width=picture_width;
   
   if(type != DOGM132 && page_cnt + page > 8)
 		page_cnt = 8 - page;
@@ -389,6 +390,7 @@ void dogGraphicDisplay::picture(byte column, byte page, const byte *pic_adress)
 	
 	for(p=0; p<page_cnt; p++)
 	{
+		byte_cnt=2+p*picture_width;	// set byte counter to the correct start position in case that picture does not fit on screen
 		position(column, page + p);
 		digitalWrite(p_a0, HIGH);
 		digitalWrite(p_cs, LOW);
