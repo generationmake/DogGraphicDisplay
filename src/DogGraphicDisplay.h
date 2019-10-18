@@ -44,10 +44,9 @@ class dogGraphicDisplay
 	void all_pixel_on	(bool state);
 	void inverse		(bool state);
 	void sleep		(bool state);
-	void string (byte column, byte page, const byte *font_adress, const char *str);
-	void string (byte column, byte page, const byte *font_adress, const char *str, byte align);
-	void string (byte column, byte page, const byte *font_adress, const char *str, byte align, byte style);
-	void stringx         (int column, byte page, const byte *font_adress, const char *str, byte align, byte style);
+	void string (int column, byte page, const byte *font_adress, const char *str);
+	void string (int column, byte page, const byte *font_adress, const char *str, byte align);
+	void string (int column, byte page, const byte *font_adress, const char *str, byte align, byte style);
 	void rectangle		(byte start_column, byte start_page, byte end_column, byte end_page, byte pattern);
 	void picture		(byte column, byte page, const byte *pic_adress);
 	byte display_width (void);
