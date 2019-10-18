@@ -13,7 +13,7 @@ It supports hardware SPI and bit bang SPI and is tested with AVR, ESP32 and SAMD
 
 This library is based on the Arduino library by EA: https://www.lcd-module.com/support/application-note/arduino-meets-ea-dog.html
 
-##Installation
+## Installation
 
 You can install this library manually in your Arduino IDE if you follow these instructions: https://www.arduino.cc/en/Guide/Libraries
 
