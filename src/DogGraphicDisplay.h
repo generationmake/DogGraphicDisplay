@@ -47,9 +47,10 @@ class dogGraphicDisplay
 	void string (byte column, byte page, const byte *font_adress, const char *str);
 	void string (byte column, byte page, const byte *font_adress, const char *str, byte align);
 	void string (byte column, byte page, const byte *font_adress, const char *str, byte align, byte style);
-	void stringx         (byte column, byte page, int offset, const byte *font_adress, const char *str);
+	void stringx         (byte column, byte page, int offset, const byte *font_adress, const char *str, byte align, byte style);
 	void rectangle		(byte start_column, byte start_page, byte end_column, byte end_page, byte pattern);
 	void picture		(byte column, byte page, const byte *pic_adress);
+	byte display_width (void);
 
   private:
     byte p_cs;
