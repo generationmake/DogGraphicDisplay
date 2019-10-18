@@ -76,17 +76,11 @@ Vars: ---
 void dogGraphicDisplay::clear(void) 
 {
 	byte page, column;
-	byte page_cnt = 8, column_cnt = 128;
+	byte page_cnt = 8;
 	
 	if(type == DOGM132)
 	{
 		page_cnt = 4;
-		column_cnt = 132;
-	}
-	if(type == DOGS102)		// define different parameters for DOGS102
-	{
-		page_cnt = 8;
-		column_cnt = 102;
 	}
 	
 	for(page = 0; page < page_cnt; page++) //Display has 8 pages
@@ -95,7 +89,7 @@ void dogGraphicDisplay::clear(void)
 		digitalWrite(p_cs, LOW);
 		digitalWrite(p_a0, HIGH);
 		
-		for(column = 0; column < column_cnt; column++) //clear the whole page line
+		for(column = 0; column < display_width(); column++) //clear the whole page line
 			spi_out(0x00);
 		
 		digitalWrite(p_cs, HIGH);
@@ -345,19 +339,15 @@ Vars: start and end column (0..127/131) and page(0..3/7), bit pattern
 void dogGraphicDisplay::rectangle(byte start_column, byte start_page, byte end_column, byte end_page, byte pattern)  
 {
 	byte x, y;
-  
-  if(type != DOGM132 && type != DOGS102 && end_column > 128) //stay inside display area
-		end_column = 128;
-  else if(type == DOGM132 && end_column > 132)
-     end_column = 132;
-  else if(type == DOGS102 && end_column > 102)
-     end_column = 102;
+
+	if(end_column>display_width())  //stay inside display area
+		end_column=display_width();  
 	if(type != DOGM132 && end_page > 7)
 		end_page = 7;
-  else if (type == DOGM132 && end_page > 3)
-	  end_page = 3;
+	else if (type == DOGM132 && end_page > 3)
+		end_page = 3;
     
-  for(y=start_page; y<=end_page; y++)
+	for(y=start_page; y<=end_page; y++)
 	{
 		position(start_column, y);
 		digitalWrite(p_a0, HIGH);
@@ -389,12 +379,8 @@ void dogGraphicDisplay::picture(byte column, byte page, const byte *pic_adress)
 	page_cnt = (pic_adress[1] + 7) / 8; //height in pages, add 7 and divide by 8 for getting the used pages (byte boundaries)
 #endif
 	     
-  if(width + column > 128 && type != DOGM132 && type != DOGS102) //stay inside display area
-		width = 128 - column;
-  else if(width + column > 132 && type == DOGM132)
-    width = 132 - column;
-  else if(width + column > 102 && type == DOGS102)
-    width = 102 - column;
+	if(width + column > display_width()) //stay inside display area
+		width = display_width() - column;
   
   if(type != DOGM132 && page_cnt + page > 8)
 		page_cnt = 8 - page;
