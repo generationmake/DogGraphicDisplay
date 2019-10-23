@@ -15,7 +15,6 @@
 #ifndef DOGGRAPHICDISPLAY_H
 #define DOGGRAPHICDISPLAY_H
 
-
 #define DOGM128 1
 #define DOGL128 2
 #define DOGM132 3
@@ -31,43 +30,42 @@
 #define STYLE_FULL_INVERSE 4
 
 #define VIEW_BOTTOM 0xC0
-#define VIEW_TOP 	0xC8
-
+#define VIEW_TOP 0xC8
 
 class dogGraphicDisplay
 {
   public:
-    void initialize     (byte p_cs, byte p_si, byte p_clk, byte p_a0, byte p_res, byte type);
-    void clear			(void);
-    void contrast       (byte contr);
-	void view		(byte direction);
-	void all_pixel_on	(bool state);
-	void inverse		(bool state);
-	void sleep		(bool state);
-	void string (int column, byte page, const byte *font_adress, const char *str);
-	void string (int column, byte page, const byte *font_adress, const char *str, byte align);
-	void string (int column, byte page, const byte *font_adress, const char *str, byte align, byte style);
-	void rectangle		(byte start_column, byte start_page, byte end_column, byte end_page, byte pattern);
-	void picture		(byte column, byte page, const byte *pic_adress);
-	byte display_width (void);
+    void initialize (byte p_cs, byte p_si, byte p_clk, byte p_a0, byte p_res, byte type);
+    void clear (void);
+    void contrast (byte contr);
+    void view (byte direction);
+    void all_pixel_on (bool state);
+    void inverse (bool state);
+    void sleep (bool state);
+    void string (int column, byte page, const byte *font_adress, const char *str);
+    void string (int column, byte page, const byte *font_adress, const char *str, byte align);
+    void string (int column, byte page, const byte *font_adress, const char *str, byte align, byte style);
+    void rectangle (byte start_column, byte start_page, byte end_column, byte end_page, byte pattern);
+    void picture (byte column, byte page, const byte *pic_adress);
+    byte display_width (void);
 
   private:
     byte p_cs;
     byte p_si;
     byte p_clk;
     byte p_a0;
-	byte type;
-	boolean hardware;
+    byte type;
+    boolean hardware;
     boolean top_view;
-	
-	void position   (byte column, byte page);
-    void command	(byte dat);
-    void data		(byte dat);
-    
-    void spi_initialize	(byte cs, byte si, byte clk);
-    void spi_put_byte	(byte dat);
-    void spi_put		(byte *dat, int len);
-	void spi_out		(byte dat);
+
+    void position (byte column, byte page);
+    void command (byte dat);
+    void data (byte dat);
+
+    void spi_initialize (byte cs, byte si, byte clk);
+    void spi_put_byte (byte dat);
+    void spi_put (byte *dat, int len);
+    void spi_out (byte dat);
 };
 
 #endif /* DOGGRAPHICDISPLAY_H */

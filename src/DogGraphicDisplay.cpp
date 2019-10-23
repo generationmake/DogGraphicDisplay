@@ -20,7 +20,6 @@
 
 #include "DogGraphicDisplay.h"
 
-
 #define INITLEN 14
 byte init_DOGM128[INITLEN] = {0x40, 0xA1, 0xC0, 0xA6, 0xA2, 0x2F, 0xF8, 0x00, 0x27, 0x81, 0x16, 0xAC, 0x00, 0xAF};
 byte init_DOGL128[INITLEN] = {0x40, 0xA1, 0xC0, 0xA6, 0xA2, 0x2F, 0xF8, 0x00, 0x27, 0x81, 0x10, 0xAC, 0x00, 0xAF}; 
@@ -38,34 +37,34 @@ Vars: CS-Pin, MOSI-Pin, SCK-Pin (MOSI=SCK Hardware else Software), A0-Pin (high=
 ------------------------------*/
 void dogGraphicDisplay::initialize(byte p_cs, byte p_si, byte p_clk, byte p_a0, byte p_res, byte type) 
 {
-	byte *ptr_init; //pointer to the correct init values
-	top_view = false; //default = bottom view
+  byte *ptr_init; //pointer to the correct init values
+  top_view = false; //default = bottom view
 
-	dogGraphicDisplay::p_a0 = p_a0;
-	pinMode(p_a0, OUTPUT);
-	spi_initialize(p_cs, p_si, p_clk); //init SPI to Mode 3
+  dogGraphicDisplay::p_a0 = p_a0;
+  pinMode(p_a0, OUTPUT);
+  spi_initialize(p_cs, p_si, p_clk); //init SPI to Mode 3
 
-	//perform a Reset
-	digitalWrite(p_res, LOW);
-	pinMode(p_res, OUTPUT);
-	delayMicroseconds(10);
-	digitalWrite(p_res, HIGH);
-	delay(1);
+  //perform a Reset
+  digitalWrite(p_res, LOW);
+  pinMode(p_res, OUTPUT);
+  delayMicroseconds(10);
+  digitalWrite(p_res, HIGH);
+  delay(1);
 
-	//Init DOGM displays, depending on users choice
-	ptr_init = init_DOGM128; //default pointer for wrong parameters
-	if(type == DOGM128) 		ptr_init = init_DOGM128;
-	else if(type == DOGL128) 	ptr_init = init_DOGL128;
-	else if(type == DOGM132) 	ptr_init = init_DOGM132;
-	else if(type == DOGS102) 	ptr_init = init_DOGS102;
-	
-	dogGraphicDisplay::type = type;
+  //Init DOGM displays, depending on users choice
+  ptr_init = init_DOGM128; //default pointer for wrong parameters
+  if(type == DOGM128) ptr_init = init_DOGM128;
+  else if(type == DOGL128) ptr_init = init_DOGL128;
+  else if(type == DOGM132) ptr_init = init_DOGM132;
+  else if(type == DOGS102) ptr_init = init_DOGS102;
 
-	digitalWrite(p_a0, LOW); //init display
-	if(type == DOGS102) spi_put(ptr_init, INITLEN_DOGS102);	// shorter init for DOGS102
-	else spi_put(ptr_init, INITLEN);
+  dogGraphicDisplay::type = type;
 
-	clear();
+  digitalWrite(p_a0, LOW);  //init display
+  if(type == DOGS102) spi_put(ptr_init, INITLEN_DOGS102);  // shorter init for DOGS102
+  else spi_put(ptr_init, INITLEN);
+
+  clear();
 }
 
 /*----------------------------
@@ -75,25 +74,25 @@ Vars: ---
 ------------------------------*/
 void dogGraphicDisplay::clear(void) 
 {
-	byte page, column;
-	byte page_cnt = 8;
-	
-	if(type == DOGM132)
-	{
-		page_cnt = 4;
-	}
-	
-	for(page = 0; page < page_cnt; page++) //Display has 8 pages
-	{
-		position(0,page);
-		digitalWrite(p_cs, LOW);
-		digitalWrite(p_a0, HIGH);
-		
-		for(column = 0; column < display_width(); column++) //clear the whole page line
-			spi_out(0x00);
-		
-		digitalWrite(p_cs, HIGH);
-	}
+  byte page, column;
+  byte page_cnt = 8;
+
+  if(type == DOGM132)
+  {
+    page_cnt = 4;
+  }
+
+  for(page = 0; page < page_cnt; page++) //Display has 8 pages
+  {
+    position(0,page);
+    digitalWrite(p_cs, LOW);
+    digitalWrite(p_a0, HIGH);
+
+    for(column = 0; column < display_width(); column++) //clear the whole page line
+      spi_out(0x00);
+
+    digitalWrite(p_cs, HIGH);
+  }
 }
 
 /*----------------------------
@@ -103,8 +102,8 @@ Vars: byte contrast (0..63)
 ------------------------------*/
 void dogGraphicDisplay::contrast(byte contr) 
 {
-	command(0x81);   		//double byte command
-	command(contr&0x3F);	//contrast has only 6 bits
+  command(0x81);  //double byte command
+  command(contr&0x3F);  //contrast has only 6 bits
 }
 
 /*----------------------------
@@ -114,20 +113,20 @@ Vars: direction (top view 0xC8, bottom view (default) = 0xC0)
 ------------------------------*/
 void dogGraphicDisplay::view(byte direction)  
 {
-	if(direction == VIEW_TOP)
-	{
-		top_view = true;
-		command(0xA0);
-	}
-	else
-	{
-		top_view = false;
-		command(0xA1);
-	}
-	
-	command(direction);
-	
-	clear(); //Clear screen, as old content is not usable (mirrored)
+  if(direction == VIEW_TOP)
+  {
+    top_view = true;
+    command(0xA0);
+  }
+  else
+  {
+    top_view = false;
+    command(0xA1);
+  }
+
+  command(direction);
+
+  clear(); //Clear screen, as old content is not usable (mirrored)
 }
 
 /*----------------------------
@@ -137,14 +136,14 @@ Vars: state (false=show SRAM content, true=set all pixel to on)
 ------------------------------*/
 void dogGraphicDisplay::all_pixel_on(bool state)  
 {
-	if(state == false)
-	{
-		command(0xA4);	// normal mode
-	}
-	else
-	{
-		command(0xA5);	// all pixels on
-	}
+  if(state == false)
+  {
+    command(0xA4);  // normal mode
+  }
+  else
+  {
+    command(0xA5);  // all pixels on
+  }
 }
 
 /*----------------------------
@@ -154,14 +153,14 @@ Vars: state (false=normal content, true=inverse content)
 ------------------------------*/
 void dogGraphicDisplay::inverse(bool state)  
 {
-	if(state == false)
-	{
-		command(0xA6);	// normal mode
-	}
-	else
-	{
-		command(0xA7);	// inverse mode
-	}
+  if(state == false)
+  {
+    command(0xA6);  // normal mode
+  }
+  else
+  {
+    command(0xA7);  // inverse mode
+  }
 }
 
 /*----------------------------
@@ -171,14 +170,14 @@ Vars: state (false=normal mode, true=sleep mode)
 ------------------------------*/
 void dogGraphicDisplay::sleep(bool state)  
 {
-	if(state == false)
-	{
-		command(0xAF);	// normal mode
-	}
-	else
-	{
-		command(0xAE);	// sleep mode
-	}
+  if(state == false)
+  {
+    command(0xAF);  // normal mode
+  }
+  else
+  {
+    command(0xAE);  // sleep mode
+  }
 }
 
 /*----------------------------
@@ -188,7 +187,7 @@ Vars: column (0..127/131), page(0..3/7),  font adress in programm memory, string
 ------------------------------*/
 void dogGraphicDisplay::string(int column, byte page, const byte *font_adress, const char *str)
 {
-	string(column, page, font_adress, str, ALIGN_LEFT, STYLE_NORMAL);
+  string(column, page, font_adress, str, ALIGN_LEFT, STYLE_NORMAL);
 }
 
 /*----------------------------
@@ -198,7 +197,7 @@ Vars: column (0..127/131), page(0..3/7),  font adress in programm memory, string
 ------------------------------*/
 void dogGraphicDisplay::string(int column, byte page, const byte *font_adress, const char *str, byte align)
 {
-	string(column, page, font_adress, str, align, STYLE_NORMAL);
+  string(column, page, font_adress, str, align, STYLE_NORMAL);
 }
 
 /*----------------------------
@@ -208,127 +207,126 @@ Vars: column (0..127/131), page(0..3/7),  font adress in programm memory, string
 ------------------------------*/
 void dogGraphicDisplay::string(int column, byte page, const byte *font_adress, const char *str, byte align, byte style)
 {
-	unsigned int pos_array; 	//Postion of character data in memory array
-	byte x, y, width_max,width_min;	//temporary column and page adress, couloumn_cnt tand width_max are used to stay inside display area
-	int column_cnt;			//temporary column and page adress, couloumn_cnt tand width_max are used to stay inside display area
-	byte start_code, last_code, width, page_height, bytes_p_char;	//font information, needed for calculation
-	const char *string;
-	int stringwidth=0; // width of string in pixels
+  unsigned int pos_array;  //Postion of character data in memory array
+  byte x, y, width_max,width_min;  //temporary column and page adress, couloumn_cnt tand width_max are used to stay inside display area
+  int column_cnt;  //temporary column and page adress, couloumn_cnt tand width_max are used to stay inside display area
+  byte start_code, last_code, width, page_height, bytes_p_char;	//font information, needed for calculation
+  const char *string;
+  int stringwidth=0; // width of string in pixels
 
 #if defined(ARDUINO_ARCH_AVR)
-	start_code 	 = pgm_read_byte(&font_adress[2]);  //get first defined character
-	last_code	 = pgm_read_byte(&font_adress[3]);  //get last defined character
-	width		 = pgm_read_byte(&font_adress[4]);  //width in pixel of one char
-	page_height  = pgm_read_byte(&font_adress[6]);  //page count per char
-	bytes_p_char = pgm_read_byte(&font_adress[7]);  //bytes per char
+  start_code = pgm_read_byte(&font_adress[2]);  //get first defined character
+  last_code = pgm_read_byte(&font_adress[3]);  //get last defined character
+  width = pgm_read_byte(&font_adress[4]);  //width in pixel of one char
+  page_height = pgm_read_byte(&font_adress[6]);  //page count per char
+  bytes_p_char = pgm_read_byte(&font_adress[7]);  //bytes per char
 #else
-	start_code 	 = font_adress[2];  //get first defined character
-	last_code	 = font_adress[3];  //get last defined character
-	width		 = font_adress[4];  //width in pixel of one char
-	page_height  = font_adress[6];  //page count per char
-	bytes_p_char = font_adress[7];  //bytes per char
+  start_code = font_adress[2];  //get first defined character
+  last_code = font_adress[3];  //get last defined character
+  width = font_adress[4];  //width in pixel of one char
+  page_height = font_adress[6];  //page count per char
+  bytes_p_char = font_adress[7];  //bytes per char
 #endif
 
-	string = str;             //temporary pointer to the beginning of the string to print
-	while(*string != 0)
-	{
-		if((byte)*string < start_code || (byte)*string > last_code) //make sure data is valid
-			string++;
-		else
-		{
-			string++;
-			stringwidth++;
-		}
-	}
-	stringwidth*=width;
+  string = str;  //temporary pointer to the beginning of the string to print
+  while(*string != 0)
+  {
+    if((byte)*string < start_code || (byte)*string > last_code) //make sure data is valid
+      string++;
+    else
+    {
+      string++;
+      stringwidth++;
+    }
+  }
+  stringwidth*=width;
   
-	if(type != DOGM132 && page_height + page > 8) //stay inside display area
-		page_height = 8 - page;
-	else  if(type == DOGM132 && page_height + page > 4)
-		page_height = 4 - page;
+  if(type != DOGM132 && page_height + page > 8) //stay inside display area
+    page_height = 8 - page;
+  else  if(type == DOGM132 && page_height + page > 4)
+    page_height = 4 - page;
 
-	if(align==ALIGN_RIGHT) 
-	{
-		if(column==0) column=display_width()-stringwidth;	//if column is 0 align string to the right border
-		else column=column-stringwidth;
-	}
-	if(align==ALIGN_CENTER) column=(display_width()-stringwidth)/2;
-  	
-	//The string is displayed character after character. If the font has more then one page, 
-	//the top page is printed first, then the next page and so on
-	for(y = 0; y < page_height; y++)
-	{
-		if(style==STYLE_FULL || style==STYLE_FULL_INVERSE)
-		{
-			
-			position(0, page+y); //set startpositon and page
-			column_cnt=0;
-			digitalWrite(p_a0, HIGH);
-			digitalWrite(p_cs, LOW);
-			while(column_cnt<column)		// fill columns until beginning of string
-			{
-				column_cnt++;
-				if(style==STYLE_FULL_INVERSE) spi_out(0xFF);
-				else spi_out(0);
-			}
-		}
-		else if(column<0) position(0,page+y);
-		else position(column, page+y); //set startpositon and page
-		column_cnt = column; //store column for display last column check
-		string = str;             //temporary pointer to the beginning of the string to print
-		digitalWrite(p_a0, HIGH);
-		digitalWrite(p_cs, LOW);
-		while(*string != 0)
-		{	
-			if(column_cnt>display_width()) string++;
-			else if(column_cnt+width<0) 
-			{
-				string++;
-				column_cnt+=width;
-			}
-			else if((byte)*string < start_code || (byte)*string > last_code) //make sure data is valid
-				string++;
-			else
-			{							
-				//calculate positon of ascii character in font array
-				//bytes for header + (ascii - startcode) * bytes per char)
-				pos_array = 8 + (unsigned int)(*string++ - start_code) * bytes_p_char;
-				pos_array += y*width; //get the dot pattern for the part of the char to print
-        
-				if((column_cnt + width) > display_width()) //stay inside display area
-					width_max = display_width()-column_cnt;
-				else
-					width_max = width;
-          
-				if(column_cnt<0) width_min=0-column_cnt;
-				else width_min=0;
+  if(align==ALIGN_RIGHT) 
+  {
+    if(column==0) column=display_width()-stringwidth;  //if column is 0 align string to the right border
+    else column=column-stringwidth;
+  }
+  if(align==ALIGN_CENTER) column=(display_width()-stringwidth)/2;
 
-				for(x=width_min; x < width_max; x++) //print the whole string
-				{
+  //The string is displayed character after character. If the font has more then one page, 
+  //the top page is printed first, then the next page and so on
+  for(y = 0; y < page_height; y++)
+  {
+    if(style==STYLE_FULL || style==STYLE_FULL_INVERSE)
+    {
+      position(0, page+y); //set startpositon and page
+      column_cnt=0;
+      digitalWrite(p_a0, HIGH);
+      digitalWrite(p_cs, LOW);
+      while(column_cnt<column)  // fill columns until beginning of string
+      {
+        column_cnt++;
+        if(style==STYLE_FULL_INVERSE) spi_out(0xFF);
+        else spi_out(0);
+      }
+    }
+    else if(column<0) position(0,page+y);
+    else position(column, page+y); //set startpositon and page
+    column_cnt = column; //store column for display last column check
+    string = str; //temporary pointer to the beginning of the string to print
+    digitalWrite(p_a0, HIGH);
+    digitalWrite(p_cs, LOW);
+    while(*string != 0)
+    {	
+      if(column_cnt>display_width()) string++;
+      else if(column_cnt+width<0) 
+      {
+        string++;
+        column_cnt+=width;
+      }
+      else if((byte)*string < start_code || (byte)*string > last_code) //make sure data is valid
+        string++;
+      else
+      {							
+        //calculate positon of ascii character in font array
+        //bytes for header + (ascii - startcode) * bytes per char)
+        pos_array = 8 + (unsigned int)(*string++ - start_code) * bytes_p_char;
+        pos_array += y*width; //get the dot pattern for the part of the char to print
+
+        if((column_cnt + width) > display_width()) //stay inside display area
+          width_max = display_width()-column_cnt;
+        else
+          width_max = width;
+
+        if(column_cnt<0) width_min=0-column_cnt;
+        else width_min=0;
+
+        for(x=width_min; x < width_max; x++) //print the whole string
+        {
 #if defined(ARDUINO_ARCH_AVR)
-					if(style==STYLE_INVERSE || style==STYLE_FULL_INVERSE) spi_out(~pgm_read_byte(&font_adress[pos_array+x]));
-					else spi_out(pgm_read_byte(&font_adress[pos_array+x]));
+          if(style==STYLE_INVERSE || style==STYLE_FULL_INVERSE) spi_out(~pgm_read_byte(&font_adress[pos_array+x]));
+          else spi_out(pgm_read_byte(&font_adress[pos_array+x]));
 #else
-					if(style==STYLE_INVERSE || style==STYLE_FULL_INVERSE) spi_out(~font_adress[pos_array+x]);
-					else spi_out(font_adress[pos_array+x]);
+          if(style==STYLE_INVERSE || style==STYLE_FULL_INVERSE) spi_out(~font_adress[pos_array+x]);
+          else spi_out(font_adress[pos_array+x]);
 #endif
-					//spi_out(pgm_read_byte(&font_adress[pos_array+x])); //double width font (bold)
-				}
-				column_cnt+=width;
-			}
-		}
-		if(style==STYLE_FULL || style==STYLE_FULL_INVERSE)
-		{
-			column_cnt=column+stringwidth;
-			while(column_cnt<display_width())
-			{
-				column_cnt++;
-				if(style==STYLE_FULL_INVERSE) spi_out(0xFF);
-				else spi_out(0);
-			}
-		}
-		digitalWrite(p_cs, HIGH);
-	}
+          //spi_out(pgm_read_byte(&font_adress[pos_array+x])); //double width font (bold)
+        }
+        column_cnt+=width;
+      }
+    }
+    if(style==STYLE_FULL || style==STYLE_FULL_INVERSE)
+    {
+      column_cnt=column+stringwidth;
+      while(column_cnt<display_width())
+      {
+        column_cnt++;
+        if(style==STYLE_FULL_INVERSE) spi_out(0xFF);
+        else spi_out(0);
+      }
+    }
+    digitalWrite(p_cs, HIGH);
+  }
 }
 
 /*----------------------------
@@ -338,26 +336,26 @@ Vars: start and end column (0..127/131) and page(0..3/7), bit pattern
 ------------------------------*/
 void dogGraphicDisplay::rectangle(byte start_column, byte start_page, byte end_column, byte end_page, byte pattern)  
 {
-	byte x, y;
+  byte x, y;
 
-	if(end_column>display_width())  //stay inside display area
-		end_column=display_width();  
-	if(type != DOGM132 && end_page > 7)
-		end_page = 7;
-	else if (type == DOGM132 && end_page > 3)
-		end_page = 3;
-    
-	for(y=start_page; y<=end_page; y++)
-	{
-		position(start_column, y);
-		digitalWrite(p_a0, HIGH);
-		digitalWrite(p_cs, LOW);	
-		
-		for(x=start_column; x<=end_column; x++)
-			spi_out(pattern);
-		
-		digitalWrite(p_cs, HIGH);
-	}
+  if(end_column>display_width())  //stay inside display area
+    end_column=display_width();  
+  if(type != DOGM132 && end_page > 7)
+    end_page = 7;
+  else if (type == DOGM132 && end_page > 3)
+    end_page = 3;
+
+  for(y=start_page; y<=end_page; y++)
+  {
+    position(start_column, y);
+    digitalWrite(p_a0, HIGH);
+    digitalWrite(p_cs, LOW);	
+
+    for(x=start_column; x<=end_column; x++)
+      spi_out(pattern);
+
+    digitalWrite(p_cs, HIGH);
+  }
 }
 
 /*----------------------------
@@ -367,43 +365,43 @@ Vars: column (0..127/131) and page(0..3/7), program memory adress of data
 ------------------------------*/
 void dogGraphicDisplay::picture(byte column, byte page, const byte *pic_adress)  
 {
-	byte c,p;
-	unsigned int byte_cnt = 2;
-	byte width,picture_width, page_cnt;
-		
+  byte c,p;
+  unsigned int byte_cnt = 2;
+  byte width,picture_width, page_cnt;
+
 #if defined(ARDUINO_ARCH_AVR)
-	picture_width = pgm_read_byte(&pic_adress[0]);
-	page_cnt = (pgm_read_byte(&pic_adress[1]) + 7) / 8; //height in pages, add 7 and divide by 8 for getting the used pages (byte boundaries)
+  picture_width = pgm_read_byte(&pic_adress[0]);
+  page_cnt = (pgm_read_byte(&pic_adress[1]) + 7) / 8; //height in pages, add 7 and divide by 8 for getting the used pages (byte boundaries)
 #else
-	picture_width = pic_adress[0];
-	page_cnt = (pic_adress[1] + 7) / 8; //height in pages, add 7 and divide by 8 for getting the used pages (byte boundaries)
+  picture_width = pic_adress[0];
+  page_cnt = (pic_adress[1] + 7) / 8; //height in pages, add 7 and divide by 8 for getting the used pages (byte boundaries)
 #endif
 	     
-	if((picture_width + column) > display_width()) //stay inside display area
-		width = display_width() - column;
-	else width=picture_width;
-  
+  if((picture_width + column) > display_width()) //stay inside display area
+    width = display_width() - column;
+  else width=picture_width;
+
   if(type != DOGM132 && page_cnt + page > 8)
-		page_cnt = 8 - page;
+    page_cnt = 8 - page;
   else if(type == DOGM132 && page_cnt + page > 4)
     page_cnt = 4 - page;
-	
-	for(p=0; p<page_cnt; p++)
-	{
-		byte_cnt=2+p*picture_width;	// set byte counter to the correct start position in case that picture does not fit on screen
-		position(column, page + p);
-		digitalWrite(p_a0, HIGH);
-		digitalWrite(p_cs, LOW);
-		
-		for(c=0; c<width; c++)
+
+  for(p=0; p<page_cnt; p++)
+  {
+    byte_cnt=2+p*picture_width;	// set byte counter to the correct start position in case that picture does not fit on screen
+    position(column, page + p);
+    digitalWrite(p_a0, HIGH);
+    digitalWrite(p_cs, LOW);
+
+    for(c=0; c<width; c++)
 #if defined(ARDUINO_ARCH_AVR)
-			spi_out(pgm_read_byte(&pic_adress[byte_cnt++]));
+      spi_out(pgm_read_byte(&pic_adress[byte_cnt++]));
 #else
-			spi_out(pic_adress[byte_cnt++]);
+      spi_out(pic_adress[byte_cnt++]);
 #endif
 		
-		digitalWrite(p_cs, HIGH);
-	}
+    digitalWrite(p_cs, HIGH);
+  }
 }
 
 /*----------------------------
@@ -413,13 +411,13 @@ Vars: none
 ------------------------------*/
 byte dogGraphicDisplay::display_width (void)
 {
-	byte column_total=128;
-	if(type == DOGM132)
-		column_total = 132;
-	if(type == DOGS102)		// define different parameters for DOGS102
-		column_total = 102;
+  byte column_total=128;
+  if(type == DOGM132)
+    column_total = 132;
+  if(type == DOGS102)  // define different parameters for DOGS102
+    column_total = 102;
 
-	return column_total;
+  return column_total;
 }
 
 //----------------------------------------------------private Functions----------------------------------------------------
@@ -432,12 +430,12 @@ Vars: column (0..127/131), page(0..3/7)
 ------------------------------*/
 void dogGraphicDisplay::position(byte column, byte page)  
 {
-	if(top_view && type != DOGM132)
-		column += 4;
-		
-	command(0x10 + (column>>4)); 	//MSB adress column
-	command(0x00 + (column&0x0F));	//LSB adress column
-	command(0xB0 + (page&0x0F)); 	//adress page	
+  if(top_view && type != DOGM132)
+    column += 4;
+
+  command(0x10 + (column>>4)); //MSB adress column
+  command(0x00 + (column&0x0F)); //LSB adress column
+  command(0xB0 + (page&0x0F)); //adress page	
 }
 
 /*----------------------------
@@ -447,8 +445,8 @@ Vars: data
 ------------------------------*/
 void dogGraphicDisplay::command(byte dat) 
 {
-	digitalWrite(p_a0, LOW);
-	spi_put_byte(dat);
+  digitalWrite(p_a0, LOW);
+  spi_put_byte(dat);
 }
 
 /*----------------------------
@@ -458,8 +456,8 @@ Vars: data
 ------------------------------*/
 void dogGraphicDisplay::data(byte dat) 
 {
-	 digitalWrite(p_a0, HIGH);
-	 spi_put_byte(dat);
+  digitalWrite(p_a0, HIGH);
+  spi_put_byte(dat);
 }
 
 /*----------------------------
@@ -469,39 +467,39 @@ Vars: CS-Pin, MOSI-Pin, SCK-Pin (MOSI=SCK Hardware else Software)
 ------------------------------*/
 void dogGraphicDisplay::spi_initialize(byte cs, byte si, byte clk) 
 {
-	//Set pin Configuration
-	p_cs = cs;
-	
-	if(si == clk)
-	{
-		hardware = true;
-		p_si = MOSI;
-		p_clk = SCK;
-	}
-	else 
-	{
-		hardware = false;
-		p_si = si;
-		p_clk = clk;
-	}
-	
-	// Set CS to deselct slaves
-	digitalWrite(p_cs, HIGH);
-	pinMode(p_cs, OUTPUT);
-	
-	// Set Data pin as output
-	pinMode(p_si, OUTPUT);
-	
-	// Set SPI-Mode 3: CLK idle high, rising edge, MSB first
-	digitalWrite(p_clk, HIGH);
-	pinMode(p_clk, OUTPUT);
-	if(hardware)
-	{	
-		SPI.begin();
-		SPI.setBitOrder(MSBFIRST);
-		SPI.setDataMode(SPI_MODE3);
-		SPI.setClockDivider(SPI_CLOCK_DIV4);
-	}
+  //Set pin Configuration
+  p_cs = cs;
+
+  if(si == clk)
+  {
+    hardware = true;
+    p_si = MOSI;
+    p_clk = SCK;
+  }
+  else 
+  {
+    hardware = false;
+    p_si = si;
+    p_clk = clk;
+  }
+
+  // Set CS to deselct slaves
+  digitalWrite(p_cs, HIGH);
+  pinMode(p_cs, OUTPUT);
+
+  // Set Data pin as output
+  pinMode(p_si, OUTPUT);
+
+  // Set SPI-Mode 3: CLK idle high, rising edge, MSB first
+  digitalWrite(p_clk, HIGH);
+  pinMode(p_clk, OUTPUT);
+  if(hardware)
+  {	
+    SPI.begin();
+    SPI.setBitOrder(MSBFIRST);
+    SPI.setDataMode(SPI_MODE3);
+    SPI.setClockDivider(SPI_CLOCK_DIV4);
+  }
 }
 
 /*----------------------------
@@ -511,9 +509,9 @@ Vars: data
 ------------------------------*/
 void dogGraphicDisplay::spi_put_byte(byte dat) 
 {
-	digitalWrite(p_cs, LOW);
-	spi_out(dat);
-	digitalWrite(p_cs, HIGH);
+  digitalWrite(p_cs, LOW);
+  spi_out(dat);
+  digitalWrite(p_cs, HIGH);
 }
 
 /*----------------------------
@@ -523,13 +521,13 @@ Vars: ptr to data and len
 ------------------------------*/
 void dogGraphicDisplay::spi_put(byte *dat, int len) 
 {
-	digitalWrite(p_cs, LOW);
-	do
-	{
-		spi_out(*dat++);
-	}while(--len);
-	
-	digitalWrite(p_cs, HIGH);
+  digitalWrite(p_cs, LOW);
+  do
+  {
+    spi_out(*dat++);
+  }while(--len);
+
+  digitalWrite(p_cs, HIGH);
 }
 
 /*----------------------------
@@ -539,23 +537,23 @@ Vars: data
 ------------------------------*/
 void dogGraphicDisplay::spi_out(byte dat) 
 {
-	byte i = 8;
-	if(hardware) 
-	{
-		SPI.transfer(dat);
-	}
-	else 
-	{
-		do 
-		{
-			if(dat & 0x80)
-				digitalWrite(p_si, HIGH);
-			else
-				digitalWrite(p_si, LOW);
-			digitalWrite(p_clk, LOW);
-			dat <<= 1;
-			digitalWrite(p_clk, HIGH);
-	  }while(--i);
-	}
+  byte i = 8;
+  if(hardware) 
+  {
+    SPI.transfer(dat);
+  }
+  else 
+  {
+    do 
+    {
+      if(dat & 0x80)
+        digitalWrite(p_si, HIGH);
+      else
+        digitalWrite(p_si, LOW);
+      digitalWrite(p_clk, LOW);
+      dat <<= 1;
+      digitalWrite(p_clk, HIGH);
+    }while(--i);
+  }
 }
 
