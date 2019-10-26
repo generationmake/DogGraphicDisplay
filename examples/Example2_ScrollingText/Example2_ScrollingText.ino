@@ -29,7 +29,7 @@ void setup() {
   pinMode(BACKLIGHTPIN,  OUTPUT);   // set backlight pin to output
   digitalWrite(BACKLIGHTPIN,  HIGH);  // enable backlight pin
 
-  DOG.initialize(6,0,0,8,9,DOGM128);   //CS = 6, 0,0= use Hardware SPI, A0 = 8, RESET = 9, EA DOGM128-6 (=128x64 dots)
+  DOG.begin(6,0,0,8,9,DOGM128);   //CS = 6, 0,0= use Hardware SPI, A0 = 8, RESET = 9, EA DOGM128-6 (=128x64 dots)
 
   DOG.clear();  //clear whole display
 }

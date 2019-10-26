@@ -35,6 +35,10 @@
 class dogGraphicDisplay
 {
   public:
+    dogGraphicDisplay ();
+    ~dogGraphicDisplay ();
+    void begin (byte p_cs, byte p_si, byte p_clk, byte p_a0, byte p_res, byte type);
+    void end ();
     void initialize (byte p_cs, byte p_si, byte p_clk, byte p_a0, byte p_res, byte type);
     void clear (void);
     void contrast (byte contr);

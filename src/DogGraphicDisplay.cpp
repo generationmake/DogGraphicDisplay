@@ -30,6 +30,38 @@ byte init_DOGS102[INITLEN_DOGS102] = {0x40, 0xA1, 0xC0, 0xA4, 0xA6, 0xA2, 0x2F, 
 //----------------------------------------------------public Functions----------------------------------------------------
 //Please use these functions in your sketch
 
+/*-----------------------------
+constructor for class, not needed by Arduino but for complete class. does not do anything.
+*/
+dogGraphicDisplay::dogGraphicDisplay() 
+{
+}
+
+/*-----------------------------
+destructor for class, not needed by Arduino but for complete class. Calls Arduino end function
+*/
+dogGraphicDisplay::~dogGraphicDisplay() 
+{
+  end();
+}
+
+/*-----------------------------
+Arduino begin function. Forward data to initialize function
+*/
+void dogGraphicDisplay::begin(byte p_cs, byte p_si, byte p_clk, byte p_a0, byte p_res, byte type) 
+{
+  initialize(p_cs, p_si, p_clk, p_a0, p_res, type);
+}
+
+/*-----------------------------
+Arduino end function. stop SPI if enabled
+*/
+void dogGraphicDisplay::end() 
+{
+  if(hardware)
+    SPI.end();
+}
+
 /*----------------------------
 Func: DOG-INIT
 Desc: Initializes SPI Hardware/Software and DOG Displays
