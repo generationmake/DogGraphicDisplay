@@ -23,7 +23,7 @@
 
 #define BACKLIGHTPIN 10
 
-dogGraphicDisplay DOG;
+DogGraphicDisplay DOG;
 
 void setup() {
   pinMode(BACKLIGHTPIN,  OUTPUT);   // set backlight pin to output

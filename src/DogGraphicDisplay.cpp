@@ -33,14 +33,14 @@ byte init_DOGS102[INITLEN_DOGS102] = {0x40, 0xA1, 0xC0, 0xA4, 0xA6, 0xA2, 0x2F, 
 /*-----------------------------
 constructor for class, not needed by Arduino but for complete class. does not do anything.
 */
-dogGraphicDisplay::dogGraphicDisplay() 
+DogGraphicDisplay::DogGraphicDisplay() 
 {
 }
 
 /*-----------------------------
 destructor for class, not needed by Arduino but for complete class. Calls Arduino end function
 */
-dogGraphicDisplay::~dogGraphicDisplay() 
+DogGraphicDisplay::~DogGraphicDisplay() 
 {
   end();
 }
@@ -48,7 +48,7 @@ dogGraphicDisplay::~dogGraphicDisplay()
 /*-----------------------------
 Arduino begin function. Forward data to initialize function
 */
-void dogGraphicDisplay::begin(byte p_cs, byte p_si, byte p_clk, byte p_a0, byte p_res, byte type) 
+void DogGraphicDisplay::begin(byte p_cs, byte p_si, byte p_clk, byte p_a0, byte p_res, byte type) 
 {
   initialize(p_cs, p_si, p_clk, p_a0, p_res, type);
 }
@@ -56,7 +56,7 @@ void dogGraphicDisplay::begin(byte p_cs, byte p_si, byte p_clk, byte p_a0, byte 
 /*-----------------------------
 Arduino end function. stop SPI if enabled
 */
-void dogGraphicDisplay::end() 
+void DogGraphicDisplay::end() 
 {
   if(hardware)
     SPI.end();
@@ -67,12 +67,12 @@ Func: DOG-INIT
 Desc: Initializes SPI Hardware/Software and DOG Displays
 Vars: CS-Pin, MOSI-Pin, SCK-Pin (MOSI=SCK Hardware else Software), A0-Pin (high=data, low=command), p_res = Reset-Pin, type (1=EA DOGM128-6, 2=EA DOGL128-6)
 ------------------------------*/
-void dogGraphicDisplay::initialize(byte p_cs, byte p_si, byte p_clk, byte p_a0, byte p_res, byte type) 
+void DogGraphicDisplay::initialize(byte p_cs, byte p_si, byte p_clk, byte p_a0, byte p_res, byte type) 
 {
   byte *ptr_init; //pointer to the correct init values
   top_view = false; //default = bottom view
 
-  dogGraphicDisplay::p_a0 = p_a0;
+  DogGraphicDisplay::p_a0 = p_a0;
   pinMode(p_a0, OUTPUT);
   spi_initialize(p_cs, p_si, p_clk); //init SPI to Mode 3
 
@@ -90,7 +90,7 @@ void dogGraphicDisplay::initialize(byte p_cs, byte p_si, byte p_clk, byte p_a0, 
   else if(type == DOGM132) ptr_init = init_DOGM132;
   else if(type == DOGS102) ptr_init = init_DOGS102;
 
-  dogGraphicDisplay::type = type;
+  DogGraphicDisplay::type = type;
 
   digitalWrite(p_a0, LOW);  //init display
   if(type == DOGS102) spi_put(ptr_init, INITLEN_DOGS102);  // shorter init for DOGS102
@@ -104,7 +104,7 @@ Func: clear_display
 Desc: clears the entire DOG-Display
 Vars: ---
 ------------------------------*/
-void dogGraphicDisplay::clear(void) 
+void DogGraphicDisplay::clear(void) 
 {
   byte page, column;
   byte page_cnt = 8;
@@ -132,7 +132,7 @@ Func: contrast
 Desc: sets contrast to the DOG-Display
 Vars: byte contrast (0..63)
 ------------------------------*/
-void dogGraphicDisplay::contrast(byte contr) 
+void DogGraphicDisplay::contrast(byte contr) 
 {
   command(0x81);  //double byte command
   command(contr&0x3F);  //contrast has only 6 bits
@@ -143,7 +143,7 @@ Func: view
 Desc: ssets the display viewing direction
 Vars: direction (top view 0xC8, bottom view (default) = 0xC0)
 ------------------------------*/
-void dogGraphicDisplay::view(byte direction)  
+void DogGraphicDisplay::view(byte direction)  
 {
   if(direction == VIEW_TOP)
   {
@@ -166,7 +166,7 @@ Func: all_pixel_on
 Desc: sets all pixel of the display to on
 Vars: state (false=show SRAM content, true=set all pixel to on)
 ------------------------------*/
-void dogGraphicDisplay::all_pixel_on(bool state)  
+void DogGraphicDisplay::all_pixel_on(bool state)  
 {
   if(state == false)
   {
@@ -183,7 +183,7 @@ Func: inverse
 Desc: inverse content of display
 Vars: state (false=normal content, true=inverse content)
 ------------------------------*/
-void dogGraphicDisplay::inverse(bool state)  
+void DogGraphicDisplay::inverse(bool state)  
 {
   if(state == false)
   {
@@ -200,7 +200,7 @@ Func: sleep
 Desc: sends the display to sleep mode (on/off)
 Vars: state (false=normal mode, true=sleep mode)
 ------------------------------*/
-void dogGraphicDisplay::sleep(bool state)  
+void DogGraphicDisplay::sleep(bool state)  
 {
   if(state == false)
   {
@@ -217,7 +217,7 @@ Func: string
 Desc: shows string with selected font on position
 Vars: column (0..127/131), page(0..3/7),  font adress in programm memory, stringarray
 ------------------------------*/
-void dogGraphicDisplay::string(int column, byte page, const byte *font_adress, const char *str)
+void DogGraphicDisplay::string(int column, byte page, const byte *font_adress, const char *str)
 {
   string(column, page, font_adress, str, ALIGN_LEFT, STYLE_NORMAL);
 }
@@ -227,7 +227,7 @@ Func: string
 Desc: shows string with selected font on position with align
 Vars: column (0..127/131), page(0..3/7),  font adress in programm memory, stringarray
 ------------------------------*/
-void dogGraphicDisplay::string(int column, byte page, const byte *font_adress, const char *str, byte align)
+void DogGraphicDisplay::string(int column, byte page, const byte *font_adress, const char *str, byte align)
 {
   string(column, page, font_adress, str, align, STYLE_NORMAL);
 }
@@ -237,7 +237,7 @@ Func: string
 Desc: shows string with selected font on position with align and style
 Vars: column (0..127/131), page(0..3/7),  font adress in programm memory, stringarray, align, style
 ------------------------------*/
-void dogGraphicDisplay::string(int column, byte page, const byte *font_adress, const char *str, byte align, byte style)
+void DogGraphicDisplay::string(int column, byte page, const byte *font_adress, const char *str, byte align, byte style)
 {
   unsigned int pos_array;  //Postion of character data in memory array
   byte x, y, width_max,width_min;  //temporary column and page adress, couloumn_cnt tand width_max are used to stay inside display area
@@ -366,7 +366,7 @@ Func: rectangle
 Desc: shows a pattern filled rectangle on the display
 Vars: start and end column (0..127/131) and page(0..3/7), bit pattern
 ------------------------------*/
-void dogGraphicDisplay::rectangle(byte start_column, byte start_page, byte end_column, byte end_page, byte pattern)  
+void DogGraphicDisplay::rectangle(byte start_column, byte start_page, byte end_column, byte end_page, byte pattern)  
 {
   byte x, y;
 
@@ -395,7 +395,7 @@ Func: picture
 Desc: shows a BLH-picture on the display (see BitMapEdit EA LCD-Tools (http://www.lcd-module.de/support.html))
 Vars: column (0..127/131) and page(0..3/7), program memory adress of data
 ------------------------------*/
-void dogGraphicDisplay::picture(byte column, byte page, const byte *pic_adress)  
+void DogGraphicDisplay::picture(byte column, byte page, const byte *pic_adress)  
 {
   byte c,p;
   unsigned int byte_cnt = 2;
@@ -441,7 +441,7 @@ Func: display_width
 Desc: returns the width of the display
 Vars: none
 ------------------------------*/
-byte dogGraphicDisplay::display_width (void)
+byte DogGraphicDisplay::display_width (void)
 {
   byte column_total=128;
   if(type == DOGM132)
@@ -460,7 +460,7 @@ Func: position
 Desc: sets write pointer in DOG-Display
 Vars: column (0..127/131), page(0..3/7)
 ------------------------------*/
-void dogGraphicDisplay::position(byte column, byte page)  
+void DogGraphicDisplay::position(byte column, byte page)  
 {
   if(top_view && type != DOGM132)
     column += 4;
@@ -475,7 +475,7 @@ Func: command
 Desc: Sends a command to the DOG-Display
 Vars: data
 ------------------------------*/
-void dogGraphicDisplay::command(byte dat) 
+void DogGraphicDisplay::command(byte dat) 
 {
   digitalWrite(p_a0, LOW);
   spi_put_byte(dat);
@@ -486,7 +486,7 @@ Func: data
 Desc: Sends data to the DOG-Display
 Vars: data
 ------------------------------*/
-void dogGraphicDisplay::data(byte dat) 
+void DogGraphicDisplay::data(byte dat) 
 {
   digitalWrite(p_a0, HIGH);
   spi_put_byte(dat);
@@ -497,7 +497,7 @@ Func: spi_initialize
 Desc: Initializes SPI Hardware/Software
 Vars: CS-Pin, MOSI-Pin, SCK-Pin (MOSI=SCK Hardware else Software)
 ------------------------------*/
-void dogGraphicDisplay::spi_initialize(byte cs, byte si, byte clk) 
+void DogGraphicDisplay::spi_initialize(byte cs, byte si, byte clk) 
 {
   //Set pin Configuration
   p_cs = cs;
@@ -539,7 +539,7 @@ Func: spi_put_byte
 Desc: Sends one Byte using CS
 Vars: data
 ------------------------------*/
-void dogGraphicDisplay::spi_put_byte(byte dat) 
+void DogGraphicDisplay::spi_put_byte(byte dat) 
 {
   digitalWrite(p_cs, LOW);
   spi_out(dat);
@@ -551,7 +551,7 @@ Func: spi_put
 Desc: Sends bytes using CS
 Vars: ptr to data and len
 ------------------------------*/
-void dogGraphicDisplay::spi_put(byte *dat, int len) 
+void DogGraphicDisplay::spi_put(byte *dat, int len) 
 {
   digitalWrite(p_cs, LOW);
   do
@@ -567,7 +567,7 @@ Func: spi_out
 Desc: Sends one Byte, no CS
 Vars: data
 ------------------------------*/
-void dogGraphicDisplay::spi_out(byte dat) 
+void DogGraphicDisplay::spi_out(byte dat) 
 {
   byte i = 8;
   if(hardware) 

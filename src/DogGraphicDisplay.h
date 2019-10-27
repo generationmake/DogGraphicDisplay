@@ -32,11 +32,11 @@
 #define VIEW_BOTTOM 0xC0
 #define VIEW_TOP 0xC8
 
-class dogGraphicDisplay
+class DogGraphicDisplay
 {
   public:
-    dogGraphicDisplay ();
-    ~dogGraphicDisplay ();
+    DogGraphicDisplay ();
+    ~DogGraphicDisplay ();
     void begin (byte p_cs, byte p_si, byte p_clk, byte p_a0, byte p_res, byte type);
     void end ();
     void initialize (byte p_cs, byte p_si, byte p_clk, byte p_a0, byte p_res, byte type);
