@@ -437,6 +437,54 @@ void DogGraphicDisplay::picture(byte column, byte page, const byte *pic_adress)
 }
 
 /*----------------------------
+Func: picture with style
+Desc: shows a BLH-picture on the display (see BitMapEdit EA LCD-Tools (http://www.lcd-module.de/support.html))
+Vars: column (0..127/131) and page(0..3/7), program memory adress of data
+------------------------------*/
+void DogGraphicDisplay::picture(byte column, byte page, const byte *pic_adress, byte style)  
+{
+  byte c,p;
+  unsigned int byte_cnt = 2;
+  byte width,picture_width, page_cnt;
+
+#if defined(ARDUINO_ARCH_AVR)
+  picture_width = pgm_read_byte(&pic_adress[0]);
+  page_cnt = (pgm_read_byte(&pic_adress[1]) + 7) / 8; //height in pages, add 7 and divide by 8 for getting the used pages (byte boundaries)
+#else
+  picture_width = pic_adress[0];
+  page_cnt = (pic_adress[1] + 7) / 8; //height in pages, add 7 and divide by 8 for getting the used pages (byte boundaries)
+#endif
+	     
+  if((picture_width + column) > display_width()) //stay inside display area
+    width = display_width() - column;
+  else width=picture_width;
+
+  if(type != DOGM132 && page_cnt + page > 8)
+    page_cnt = 8 - page;
+  else if(type == DOGM132 && page_cnt + page > 4)
+    page_cnt = 4 - page;
+
+  for(p=0; p<page_cnt; p++)
+  {
+    byte_cnt=2+p*picture_width;	// set byte counter to the correct start position in case that picture does not fit on screen
+    position(column, page + p);
+    digitalWrite(p_a0, HIGH);
+    digitalWrite(p_cs, LOW);
+
+    for(c=0; c<width; c++)
+#if defined(ARDUINO_ARCH_AVR)
+      if(style==STYLE_INVERSE || style==STYLE_FULL_INVERSE) spi_out(~pgm_read_byte(&pic_adress[byte_cnt++]));
+      else spi_out(pgm_read_byte(&pic_adress[byte_cnt++]));
+#else
+      if(style==STYLE_INVERSE || style==STYLE_FULL_INVERSE) spi_out(~pic_adress[byte_cnt++]);
+      else spi_out(pic_adress[byte_cnt++]);
+#endif
+		
+    digitalWrite(p_cs, HIGH);
+  }
+}
+
+/*----------------------------
 Func: display_width
 Desc: returns the width of the display
 Vars: none
