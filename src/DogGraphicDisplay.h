@@ -52,6 +52,11 @@ class DogGraphicDisplay
     void rectangle (byte start_column, byte start_page, byte end_column, byte end_page, byte pattern);
     void picture (byte column, byte page, const byte *pic_adress);
     byte display_width (void);
+    void setPixel(int x, int y, bool value);
+    void drawLine(int x0, int y0, int x1, int y1);
+    void drawCircle(int x0, int y0, int r, bool fill); 
+    void drawRect(int x0, int y0, int width, int height, bool fill);
+    void drawCross(int x0, int y0, int width, int height);
 
   private:
     byte p_cs;
@@ -61,6 +66,7 @@ class DogGraphicDisplay
     byte type;
     boolean hardware;
     boolean top_view;
+    byte canvas[128][64];
 
     void position (byte column, byte page);
     void command (byte dat);

@@ -90,6 +90,13 @@ void DogGraphicDisplay::initialize(byte p_cs, byte p_si, byte p_clk, byte p_a0, 
   else if(type == DOGM132) ptr_init = init_DOGM132;
   else if(type == DOGS102) ptr_init = init_DOGS102;
 
+  for(int x = 0; x < 128; x++)
+  {
+     for(int y = 0; y < 64; y++)
+     {
+        canvas[x][y] = 0;
+     }
+  }
   DogGraphicDisplay::type = type;
 
   digitalWrite(p_a0, LOW);  //init display
@@ -450,6 +457,129 @@ byte DogGraphicDisplay::display_width (void)
     column_total = 102;
 
   return column_total;
+}
+
+/*----------------------------
+Func: setPixel
+Desc: set single pixel value
+Vars: x, y coordinates, value(true = black, false = white
+------------------------------*/
+void DogGraphicDisplay::setPixel(int x, int y, bool value)
+{
+  byte page = (y * 8) / 64;
+  y = y - 8 * page;
+  if(value)
+  {
+    canvas[x][page] |= (1<<y);
+  }
+  else
+  {
+    canvas[x][page] &= ~(1<<y);
+  }
+
+  rectangle(x, page, x, page, canvas[x][page]);
+}
+
+/*----------------------------
+Func: drawLine
+Desc: draw line on display
+Vars: start and end coordinates
+------------------------------*/
+void DogGraphicDisplay::drawLine(int x0, int y0, int x1, int y1)
+{
+  int dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
+  int dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; 
+  int err = (dx>dy ? dx : -dy)/2, e2;
+ 
+  for(;;){
+    setPixel(x0,y0, true);
+    if (x0==x1 && y0==y1) break;
+    e2 = err;
+    if (e2 >-dx) { err -= dy; x0 += sx; }
+    if (e2 < dy) { err += dx; y0 += sy; }
+  }
+}
+
+/*----------------------------
+Func: drawCircle
+Desc: draw circle on display
+Vars: center coordinates, radius, fill( true = filled, false = not filled )
+------------------------------*/
+void DogGraphicDisplay::drawCircle(int x0, int y0, int r, bool fill) 
+{ 
+    int x = r;
+    int y = 0;
+    int err = 0;
+ 
+    while (x >= y)
+    {
+      if(!fill) 
+      {
+        setPixel(x0 + x, y0 + y, true);
+        setPixel(x0 + y, y0 + x, true);
+        setPixel(x0 - y, y0 + x, true);
+        setPixel(x0 - x, y0 + y, true);
+        setPixel(x0 - x, y0 - y, true);
+        setPixel(x0 - y, y0 - x, true);
+        setPixel(x0 + y, y0 - x, true);
+        setPixel(x0 + x, y0 - y, true);
+      }
+      else
+      {
+        drawLine(x0 + x, y0 + y, x0 - x, y0 + y);
+        drawLine(x0 + y, y0 + x, x0 - y, y0 + x);
+        drawLine(x0 - x, y0 - y, x0 + x, y0 - y);
+        drawLine(x0 - y, y0 - x, x0 + y, y0 - x);
+      }
+      
+      if (err <= 0)
+      {
+          y += 1;
+          err += 2*y + 1;
+      }
+     
+      if (err > 0)
+      {
+          x -= 1;
+          err -= 2*x + 1;
+      }
+    }
+} 
+
+/*----------------------------
+Func: drawRect
+Desc: draw rectangle on display
+Vars: coordinates of upper left corner, width and height, fill( true = filled, false = not filled )
+------------------------------*/
+void DogGraphicDisplay::drawRect(int x0, int y0, int width, int height, bool fill)
+{
+  if(!fill)
+  {
+    drawLine(x0, y0, x0 + width, y0);
+    drawLine(x0, y0 + height, x0 + width, y0 + height);
+    drawLine(x0, y0, x0, y0 + height);
+    drawLine(x0 + width, y0, x0 + width, y0 + height);
+  }
+  else
+  {
+    for(int y = y0; y <= y0 + height; y++)
+    {
+      drawLine(x0, y, x0 + width, y);
+    }
+  }
+}
+
+/*----------------------------
+Func: drawCross
+Desc: draw X on display
+Vars: center coordinates, width and height
+------------------------------*/
+void DogGraphicDisplay::drawCross(int x0, int y0, int width, int height)
+{
+  drawLine(x0, y0, x0 + width, y0 + height);
+  drawLine(x0, y0, x0 + width, y0 - height);
+  drawLine(x0, y0, x0 - width, y0 + height);
+  drawLine(x0, y0, x0 - width, y0 - height);
 }
 
 //----------------------------------------------------private Functions----------------------------------------------------
