@@ -65,11 +65,6 @@ void DogGraphicDisplay::begin(byte p_cs, byte p_si, byte p_clk, byte p_a0, byte 
 	this->canvasUpperLeftX = canvasUpperLeftX;
 	this->canvasUpperLeftY = canvasUpperLeftY;
 	
-	canvas = new byte*[canvasSizeX];
-	for(byte i = 0; i < canvasSizeX; ++i) {
-	    canvas[i] = new byte[canvasSizeY];
-	}
-
   for(int x = 0; x < canvasSizeX; x++)
   {
      for(int y = 0; y < canvasSizeY; y++)
@@ -86,11 +81,6 @@ void DogGraphicDisplay::end()
 {
   if(hardware)
     SPI.end();
-
-	for(int i = 0; i < canvasSizeY; ++i) {
-  	  delete [] canvas[i];
-	}
-	delete [] canvas;
 }
 
 /*----------------------------

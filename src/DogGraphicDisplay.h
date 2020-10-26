@@ -68,7 +68,7 @@ class DogGraphicDisplay
     boolean hardware;
     boolean top_view;
 
-    byte **canvas;
+		byte canvas[128][64];
 		byte canvasSizeX, canvasSizeY;
 		byte canvasUpperLeftX, canvasUpperLeftY;
 
