@@ -46,20 +46,51 @@ DogGraphicDisplay::~DogGraphicDisplay()
 }
 
 /*-----------------------------
-Arduino begin function. Forward data to initialize function
+Arduino begin function. Forward data to initialize function and initialize canvas fullscreen
 */
 void DogGraphicDisplay::begin(byte p_cs, byte p_si, byte p_clk, byte p_a0, byte p_res, byte type) 
 {
-  initialize(p_cs, p_si, p_clk, p_a0, p_res, type);
+  begin(p_cs, p_si, p_clk, p_a0, p_res, type, 128, 64, 0, 0);
 }
 
 /*-----------------------------
-Arduino end function. stop SPI if enabled
+Arduino begin function. Forward data to initialize function and initialize canvas dynamically
+*/
+void DogGraphicDisplay::begin(byte p_cs, byte p_si, byte p_clk, byte p_a0, byte p_res, byte type, byte canvasSizeX, byte canvasSizeY, byte canvasUpperLeftX, byte canvasUpperLeftY)
+{
+	initialize(p_cs, p_si, p_clk, p_a0, p_res, type);
+
+	this->canvasSizeX = canvasSizeX;
+	this->canvasSizeY = canvasSizeY;
+	this->canvasUpperLeftX = canvasUpperLeftX;
+	this->canvasUpperLeftY = canvasUpperLeftY;
+	
+	canvas = new byte*[canvasSizeX];
+	for(byte i = 0; i < canvasSizeX; ++i) {
+	    canvas[i] = new byte[canvasSizeY];
+	}
+
+  for(int x = 0; x < canvasSizeX; x++)
+  {
+     for(int y = 0; y < canvasSizeY; y++)
+     {
+        canvas[x][y] = 0;
+     }
+  }
+}
+
+/*-----------------------------
+Arduino end function. stop SPI if enabled and delete canvas memory area
 */
 void DogGraphicDisplay::end() 
 {
   if(hardware)
     SPI.end();
+
+	for(int i = 0; i < canvasSizeY; ++i) {
+  	  delete [] canvas[i];
+	}
+	delete [] canvas;
 }
 
 /*----------------------------
@@ -90,13 +121,6 @@ void DogGraphicDisplay::initialize(byte p_cs, byte p_si, byte p_clk, byte p_a0, 
   else if(type == DOGM132) ptr_init = init_DOGM132;
   else if(type == DOGS102) ptr_init = init_DOGS102;
 
-  for(int x = 0; x < 128; x++)
-  {
-     for(int y = 0; y < 64; y++)
-     {
-        canvas[x][y] = 0;
-     }
-  }
   DogGraphicDisplay::type = type;
 
   digitalWrite(p_a0, LOW);  //init display
@@ -466,18 +490,24 @@ Vars: x, y coordinates, value(true = black, false = white
 ------------------------------*/
 void DogGraphicDisplay::setPixel(int x, int y, bool value)
 {
-  byte page = (y * 8) / 64;
-  y = y - 8 * page;
-  if(value)
-  {
-    canvas[x][page] |= (1<<y);
-  }
-  else
-  {
-    canvas[x][page] &= ~(1<<y);
-  }
+	if(x < canvasSizeX && y < canvasSizeY)
+	{
+		x += canvasUpperLeftX;
+		y += canvasUpperLeftY;
 
-  rectangle(x, page, x, page, canvas[x][page]);
+		byte page = (y * 8) / 64;
+		y = y - 8 * page;
+		if(value)
+		{
+		  canvas[x][page] |= (1<<y);
+		}
+		else
+		{
+		  canvas[x][page] &= ~(1<<y);
+		}
+
+		rectangle(x, page, x, page, canvas[x][page]);
+	}
 }
 
 /*----------------------------

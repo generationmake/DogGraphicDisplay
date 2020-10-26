@@ -38,6 +38,7 @@ class DogGraphicDisplay
     DogGraphicDisplay ();
     ~DogGraphicDisplay ();
     void begin (byte p_cs, byte p_si, byte p_clk, byte p_a0, byte p_res, byte type);
+		void begin (byte p_cs, byte p_si, byte p_clk, byte p_a0, byte p_res, byte type, byte canvasSizeX, byte canvasSizeY, byte canvasUpperLeftX, byte canvasUpperLeftY);
     void end ();
     void initialize (byte p_cs, byte p_si, byte p_clk, byte p_a0, byte p_res, byte type);
     void clear (void);
@@ -66,7 +67,10 @@ class DogGraphicDisplay
     byte type;
     boolean hardware;
     boolean top_view;
-    byte canvas[128][64];
+
+    byte **canvas;
+		byte canvasSizeX, canvasSizeY;
+		byte canvasUpperLeftX, canvasUpperLeftY;
 
     void position (byte column, byte page);
     void command (byte dat);
