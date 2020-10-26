@@ -21,6 +21,7 @@ void setup() {
 
   DOG.begin(6,0,0, 0, 1,DOGM128); 
   DOG.clear();
+  DOG.createCanvas(128, 64, 0, 0);
 
   DOG.drawLine(0, 0, 127, 63);
   DOG.drawCircle(50, 30, 20, false);
@@ -28,6 +29,7 @@ void setup() {
   DOG.drawRect(60, 20, 20, 10, true);
   DOG.drawRect(80, 40, 10, 20, false);
   DOG.drawCross(90, 20, 10, 10);
+	DOG.deleteCanvas();
 }
 
 void loop() {

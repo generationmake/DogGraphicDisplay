@@ -50,28 +50,7 @@ Arduino begin function. Forward data to initialize function and initialize canva
 */
 void DogGraphicDisplay::begin(byte p_cs, byte p_si, byte p_clk, byte p_a0, byte p_res, byte type) 
 {
-  begin(p_cs, p_si, p_clk, p_a0, p_res, type, 128, 64, 0, 0);
-}
-
-/*-----------------------------
-Arduino begin function. Forward data to initialize function and initialize canvas dynamically
-*/
-void DogGraphicDisplay::begin(byte p_cs, byte p_si, byte p_clk, byte p_a0, byte p_res, byte type, byte canvasSizeX, byte canvasSizeY, byte canvasUpperLeftX, byte canvasUpperLeftY)
-{
 	initialize(p_cs, p_si, p_clk, p_a0, p_res, type);
-
-	this->canvasSizeX = canvasSizeX;
-	this->canvasSizeY = canvasSizeY;
-	this->canvasUpperLeftX = canvasUpperLeftX;
-	this->canvasUpperLeftY = canvasUpperLeftY;
-	
-  for(int x = 0; x < canvasSizeX; x++)
-  {
-     for(int y = 0; y < canvasSizeY; y++)
-     {
-        canvas[x][y] = 0;
-     }
-  }
 }
 
 /*-----------------------------
@@ -81,6 +60,7 @@ void DogGraphicDisplay::end()
 {
   if(hardware)
     SPI.end();
+	delete [] canvas;
 }
 
 /*----------------------------
@@ -474,6 +454,37 @@ byte DogGraphicDisplay::display_width (void)
 }
 
 /*----------------------------
+Func: createCanvas
+Desc: creates Canvas
+Vars: canvas size and point of upper left corner
+------------------------------*/
+void DogGraphicDisplay::createCanvas(byte canvasSizeX, byte canvasSizeY, byte upperLeftX, byte upperLeftY)
+{
+	this->canvasSizeX = canvasSizeX;
+	this->canvasSizeY = canvasSizeY;
+	this->canvasUpperLeftX = upperLeftX;
+	this->canvasUpperLeftY = upperLeftY;
+	canvas = new byte[canvasSizeX * canvasSizeY / 8];
+
+	for(int x = 0; x < canvasSizeX; x++)
+	{
+		for(int page = 0; page < canvasSizeY / 8; page ++)
+		{
+			canvas[page * canvasSizeX + x] = 0;
+		}
+	}
+}
+
+/*----------------------------
+Func: deleteCanvas
+Desc: deletes Canvas so memory is free again
+------------------------------*/
+void DogGraphicDisplay::deleteCanvas()
+{
+	delete[] canvas;
+}
+
+/*----------------------------
 Func: setPixel
 Desc: set single pixel value
 Vars: x, y coordinates, value(true = black, false = white
@@ -485,18 +496,18 @@ void DogGraphicDisplay::setPixel(int x, int y, bool value)
 		x += canvasUpperLeftX;
 		y += canvasUpperLeftY;
 
-		byte page = (y * 8) / 64;
+		byte page = (y * 8) / canvasSizeY;
 		y = y - 8 * page;
 		if(value)
 		{
-		  canvas[x][page] |= (1<<y);
+			canvas[page * canvasSizeX + x] |= (1<<y);
 		}
 		else
 		{
-		  canvas[x][page] &= ~(1<<y);
+			canvas[page * canvasSizeX + x] &= ~(1<<y);
 		}
 
-		rectangle(x, page, x, page, canvas[x][page]);
+		rectangle(x, page, x, page, canvas[page * canvasSizeX + x]);
 	}
 }
 

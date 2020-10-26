@@ -38,7 +38,6 @@ class DogGraphicDisplay
     DogGraphicDisplay ();
     ~DogGraphicDisplay ();
     void begin (byte p_cs, byte p_si, byte p_clk, byte p_a0, byte p_res, byte type);
-		void begin (byte p_cs, byte p_si, byte p_clk, byte p_a0, byte p_res, byte type, byte canvasSizeX, byte canvasSizeY, byte canvasUpperLeftX, byte canvasUpperLeftY);
     void end ();
     void initialize (byte p_cs, byte p_si, byte p_clk, byte p_a0, byte p_res, byte type);
     void clear (void);
@@ -53,6 +52,8 @@ class DogGraphicDisplay
     void rectangle (byte start_column, byte start_page, byte end_column, byte end_page, byte pattern);
     void picture (byte column, byte page, const byte *pic_adress);
     byte display_width (void);
+		void createCanvas(byte canvasSizeX, byte canvasSizeY, byte upperLeftX, byte upperLeftY);
+		void deleteCanvas();
     void setPixel(int x, int y, bool value);
     void drawLine(int x0, int y0, int x1, int y1);
     void drawCircle(int x0, int y0, int r, bool fill); 
@@ -68,7 +69,8 @@ class DogGraphicDisplay
     boolean hardware;
     boolean top_view;
 
-		byte canvas[128][64];
+		byte *canvas;
+
 		byte canvasSizeX, canvasSizeY;
 		byte canvasUpperLeftX, canvasUpperLeftY;
 
