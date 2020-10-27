@@ -15,6 +15,8 @@
 #ifndef DOGGRAPHICDISPLAY_H
 #define DOGGRAPHICDISPLAY_H
 
+#include <Arduino.h>
+
 #define DOGM128 1
 #define DOGL128 2
 #define DOGM132 3
@@ -71,7 +73,7 @@ class DogGraphicDisplay
 
 		byte *canvas;
 
-		byte canvasSizeX, canvasSizeY;
+		byte canvasSizeX, canvasSizeY, canvasPages;
 		byte canvasUpperLeftX, canvasUpperLeftY;
 
     void position (byte column, byte page);

@@ -464,11 +464,29 @@ void DogGraphicDisplay::createCanvas(byte canvasSizeX, byte canvasSizeY, byte up
 	this->canvasSizeY = canvasSizeY;
 	this->canvasUpperLeftX = upperLeftX;
 	this->canvasUpperLeftY = upperLeftY;
-	canvas = new byte[canvasSizeX * canvasSizeY / 8];
+
+	byte rest = this->canvasSizeY % 8;
+
+	if(rest > 0)
+	{
+		for(int n = 1; n <= 8; n++)
+		{
+			int next = n * 8;
+			if(this->canvasSizeY < next)
+			{
+				this->canvasSizeY = next;
+				break;
+			}
+		}
+	}
+
+	canvasPages = this->canvasSizeY / 8;
+	canvas = new byte[canvasSizeX * canvasPages];
+
 
 	for(int x = 0; x < canvasSizeX; x++)
 	{
-		for(int page = 0; page < canvasSizeY / 8; page ++)
+		for(int page = 0; page < canvasPages; page ++)
 		{
 			canvas[page * canvasSizeX + x] = 0;
 		}
@@ -491,12 +509,13 @@ Vars: x, y coordinates, value(true = black, false = white
 ------------------------------*/
 void DogGraphicDisplay::setPixel(int x, int y, bool value)
 {
-	if(x < canvasSizeX && y < canvasSizeY)
-	{
-		x += canvasUpperLeftX;
-		y += canvasUpperLeftY;
+	x += canvasUpperLeftX;
+	y += canvasUpperLeftY;
 
-		byte page = (y * 8) / canvasSizeY;
+	if(x < canvasSizeX && y < canvasSizeY && x > canvasUpperLeftX && y > canvasUpperLeftY)
+	{
+
+		byte page = (y * canvasPages) / canvasSizeY;
 		y = y - 8 * page;
 		if(value)
 		{
