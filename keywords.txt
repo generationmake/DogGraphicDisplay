@@ -12,23 +12,23 @@ DogGraphicDisplay	KEYWORD1
 # Methods and Functions (KEYWORD2)
 #######################################
 initialize	KEYWORD2
-clear	KEYWORD2       
-contrast	KEYWORD2        
+clear	KEYWORD2
+contrast	KEYWORD2
 view	KEYWORD2
 all_pixel_on	KEYWORD2
 inverse	KEYWORD2
 sleep	KEYWORD2
 string	KEYWORD2
-rectangle	KEYWORD2  
-picture	KEYWORD2     
-display_width	KEYWORD2     
-createCanvas	KEYWORD2     
-deleteCanvas	KEYWORD2     
-setPixel	KEYWORD2     
-drawLine	KEYWORD2     
-drawCircle	KEYWORD2     
-drawRect	KEYWORD2     
-drawCross	KEYWORD2     
+rectangle	KEYWORD2
+picture	KEYWORD2
+display_width	KEYWORD2
+createCanvas	KEYWORD2
+deleteCanvas	KEYWORD2
+setPixel	KEYWORD2
+drawLine	KEYWORD2
+drawCircle	KEYWORD2
+drawRect	KEYWORD2
+drawCross	KEYWORD2
 
 
 #######################################
@@ -47,4 +47,3 @@ STYLE_NORMAL	LITERAL1
 STYLE_FULL	LITERAL1
 STYLE_INVERSE	LITERAL1
 STYLE_FULL_INVERSE	LITERAL1
-

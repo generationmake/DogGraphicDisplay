@@ -6,10 +6,10 @@
 #define UBUNTUMONO_B_16_LEN 1528
 #if defined(ARDUINO_ARCH_AVR)
   // AVR-specific code
-const byte UBUNTUMONO_B_16[UBUNTUMONO_B_16_LEN] __attribute__((section(".progmem.data"))) = 
+const byte UBUNTUMONO_B_16[UBUNTUMONO_B_16_LEN] __attribute__((section(".progmem.data"))) =
 #else
   // generic, non-platform specific code
-const byte UBUNTUMONO_B_16[UBUNTUMONO_B_16_LEN] = 
+const byte UBUNTUMONO_B_16[UBUNTUMONO_B_16_LEN] =
 #endif
 {
 70,86,0x20,0x7E,8,16,2,16,
