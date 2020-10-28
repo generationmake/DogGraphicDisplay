@@ -816,4 +816,3 @@ void DogGraphicDisplay::spi_out(byte dat)
     }while(--i);
   }
 }
-

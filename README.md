@@ -20,4 +20,3 @@ This library is based on the Arduino library by EA: https://www.lcd-module.com/s
 ## Installation
 
 You can install this library manually in your Arduino IDE if you follow these instructions: https://www.arduino.cc/en/Guide/Libraries
-
