@@ -50,7 +50,7 @@ Arduino begin function. Forward data to initialize function and initialize canva
 */
 void DogGraphicDisplay::begin(byte p_cs, byte p_si, byte p_clk, byte p_a0, byte p_res, byte type) 
 {
-	initialize(p_cs, p_si, p_clk, p_a0, p_res, type);
+  initialize(p_cs, p_si, p_clk, p_a0, p_res, type);
 }
 
 /*-----------------------------
@@ -60,7 +60,7 @@ void DogGraphicDisplay::end()
 {
   if(hardware)
     SPI.end();
-	delete [] canvas;
+  delete [] canvas;
 }
 
 /*----------------------------
@@ -243,7 +243,7 @@ void DogGraphicDisplay::string(int column, byte page, const byte *font_adress, c
   unsigned int pos_array;  //Position of character data in memory array
   byte x, y, width_max,width_min;  //temporary column and page address, couloumn_cnt tand width_max are used to stay inside display area
   int column_cnt;  //temporary column and page address, couloumn_cnt tand width_max are used to stay inside display area
-  byte start_code, last_code, width, page_height, bytes_p_char;	//font information, needed for calculation
+  byte start_code, last_code, width, page_height, bytes_p_char; //font information, needed for calculation
   const char *string;
   int stringwidth=0; // width of string in pixels
 
@@ -310,7 +310,7 @@ void DogGraphicDisplay::string(int column, byte page, const byte *font_adress, c
     digitalWrite(p_a0, HIGH);
     digitalWrite(p_cs, LOW);
     while(*string != 0)
-    {	
+    {
       if(column_cnt>display_width()) string++;
       else if(column_cnt+width<0) 
       {
@@ -320,7 +320,7 @@ void DogGraphicDisplay::string(int column, byte page, const byte *font_adress, c
       else if((byte)*string < start_code || (byte)*string > last_code) //make sure data is valid
         string++;
       else
-      {							
+      {					
         //calculate position of ascii character in font array
         //bytes for header + (ascii - startcode) * bytes per char)
         pos_array = 8 + (unsigned int)(*string++ - start_code) * bytes_p_char;
@@ -382,7 +382,7 @@ void DogGraphicDisplay::rectangle(byte start_column, byte start_page, byte end_c
   {
     position(start_column, y);
     digitalWrite(p_a0, HIGH);
-    digitalWrite(p_cs, LOW);	
+    digitalWrite(p_cs, LOW);
 
     for(x=start_column; x<=end_column; x++)
       spi_out(pattern);
@@ -409,7 +409,7 @@ void DogGraphicDisplay::picture(byte column, byte page, const byte *pic_adress)
   picture_width = pic_adress[0];
   page_cnt = (pic_adress[1] + 7) / 8; //height in pages, add 7 and divide by 8 for getting the used pages (byte boundaries)
 #endif
-	     
+
   if((picture_width + column) > display_width()) //stay inside display area
     width = display_width() - column;
   else width=picture_width;
@@ -421,7 +421,7 @@ void DogGraphicDisplay::picture(byte column, byte page, const byte *pic_adress)
 
   for(p=0; p<page_cnt; p++)
   {
-    byte_cnt=2+p*picture_width;	// set byte counter to the correct start position in case that picture does not fit on screen
+    byte_cnt=2+p*picture_width; // set byte counter to the correct start position in case that picture does not fit on screen
     position(column, page + p);
     digitalWrite(p_a0, HIGH);
     digitalWrite(p_cs, LOW);
@@ -432,7 +432,7 @@ void DogGraphicDisplay::picture(byte column, byte page, const byte *pic_adress)
 #else
       spi_out(pic_adress[byte_cnt++]);
 #endif
-		
+
     digitalWrite(p_cs, HIGH);
   }
 }
@@ -455,7 +455,7 @@ void DogGraphicDisplay::picture(byte column, byte page, const byte *pic_adress, 
   picture_width = pic_adress[0];
   page_cnt = (pic_adress[1] + 7) / 8; //height in pages, add 7 and divide by 8 for getting the used pages (byte boundaries)
 #endif
-	     
+
   if((picture_width + column) > display_width()) //stay inside display area
     width = display_width() - column;
   else width=picture_width;
@@ -467,7 +467,7 @@ void DogGraphicDisplay::picture(byte column, byte page, const byte *pic_adress, 
 
   for(p=0; p<page_cnt; p++)
   {
-    byte_cnt=2+p*picture_width;	// set byte counter to the correct start position in case that picture does not fit on screen
+    byte_cnt=2+p*picture_width; // set byte counter to the correct start position in case that picture does not fit on screen
     position(column, page + p);
     digitalWrite(p_a0, HIGH);
     digitalWrite(p_cs, LOW);
@@ -480,7 +480,7 @@ void DogGraphicDisplay::picture(byte column, byte page, const byte *pic_adress, 
       if(style==STYLE_INVERSE || style==STYLE_FULL_INVERSE) spi_out(~pic_adress[byte_cnt++]);
       else spi_out(pic_adress[byte_cnt++]);
 #endif
-		
+
     digitalWrite(p_cs, HIGH);
   }
 }
@@ -508,37 +508,37 @@ Vars: canvas size and point of upper left corner
 ------------------------------*/
 void DogGraphicDisplay::createCanvas(byte canvasSizeX, byte canvasSizeY, byte upperLeftX, byte upperLeftY)
 {
-	this->canvasSizeX = canvasSizeX;
-	this->canvasSizeY = canvasSizeY;
-	this->canvasUpperLeftX = upperLeftX;
-	this->canvasUpperLeftY = upperLeftY;
+  this->canvasSizeX = canvasSizeX;
+  this->canvasSizeY = canvasSizeY;
+  this->canvasUpperLeftX = upperLeftX;
+  this->canvasUpperLeftY = upperLeftY;
 
-	byte rest = this->canvasSizeY % 8;
+  byte rest = this->canvasSizeY % 8;
 
-	if(rest > 0)
-	{
-		for(int n = 1; n <= 8; n++)
-		{
-			int next = n * 8;
-			if(this->canvasSizeY < next)
-			{
-				this->canvasSizeY = next;
-				break;
-			}
-		}
-	}
+  if(rest > 0)
+  {
+    for(int n = 1; n <= 8; n++)
+    {
+      int next = n * 8;
+      if(this->canvasSizeY < next)
+      {
+        this->canvasSizeY = next;
+        break;
+      }
+    }
+  }
 
-	canvasPages = this->canvasSizeY / 8;
-	canvas = new byte[canvasSizeX * canvasPages];
+  canvasPages = this->canvasSizeY / 8;
+  canvas = new byte[canvasSizeX * canvasPages];
 
 
-	for(int x = 0; x < canvasSizeX; x++)
-	{
-		for(int page = 0; page < canvasPages; page ++)
-		{
-			canvas[page * canvasSizeX + x] = 0;
-		}
-	}
+  for(int x = 0; x < canvasSizeX; x++)
+  {
+    for(int page = 0; page < canvasPages; page ++)
+    {
+      canvas[page * canvasSizeX + x] = 0;
+    }
+  }
 }
 
 /*----------------------------
@@ -547,7 +547,7 @@ Desc: deletes Canvas so memory is free again
 ------------------------------*/
 void DogGraphicDisplay::deleteCanvas()
 {
-	delete[] canvas;
+  delete[] canvas;
 }
 
 /*----------------------------
@@ -557,25 +557,25 @@ Vars: x, y coordinates, value(true = black, false = white
 ------------------------------*/
 void DogGraphicDisplay::setPixel(int x, int y, bool value)
 {
-	x += canvasUpperLeftX;
-	y += canvasUpperLeftY;
+  x += canvasUpperLeftX;
+  y += canvasUpperLeftY;
 
-	if(x < canvasSizeX && y < canvasSizeY && x > canvasUpperLeftX && y > canvasUpperLeftY)
-	{
+  if(x < canvasSizeX && y < canvasSizeY && x > canvasUpperLeftX && y > canvasUpperLeftY)
+  {
 
-		byte page = (y * canvasPages) / canvasSizeY;
-		y = y - 8 * page;
-		if(value)
-		{
-			canvas[page * canvasSizeX + x] |= (1<<y);
-		}
-		else
-		{
-			canvas[page * canvasSizeX + x] &= ~(1<<y);
-		}
+    byte page = (y * canvasPages) / canvasSizeY;
+    y = y - 8 * page;
+    if(value)
+    {
+      canvas[page * canvasSizeX + x] |= (1<<y);
+    }
+    else
+    {
+      canvas[page * canvasSizeX + x] &= ~(1<<y);
+    }
 
-		rectangle(x, page, x, page, canvas[page * canvasSizeX + x]);
-	}
+    rectangle(x, page, x, page, canvas[page * canvasSizeX + x]);
+  }
 }
 
 /*----------------------------
@@ -605,43 +605,43 @@ Vars: center coordinates, radius, fill( true = filled, false = not filled )
 ------------------------------*/
 void DogGraphicDisplay::drawCircle(int x0, int y0, int r, bool fill) 
 { 
-    int x = r;
-    int y = 0;
-    int err = 0;
- 
-    while (x >= y)
+  int x = r;
+  int y = 0;
+  int err = 0;
+
+  while (x >= y)
+  {
+    if(!fill) 
     {
-      if(!fill) 
-      {
-        setPixel(x0 + x, y0 + y, true);
-        setPixel(x0 + y, y0 + x, true);
-        setPixel(x0 - y, y0 + x, true);
-        setPixel(x0 - x, y0 + y, true);
-        setPixel(x0 - x, y0 - y, true);
-        setPixel(x0 - y, y0 - x, true);
-        setPixel(x0 + y, y0 - x, true);
-        setPixel(x0 + x, y0 - y, true);
-      }
-      else
-      {
-        drawLine(x0 + x, y0 + y, x0 - x, y0 + y);
-        drawLine(x0 + y, y0 + x, x0 - y, y0 + x);
-        drawLine(x0 - x, y0 - y, x0 + x, y0 - y);
-        drawLine(x0 - y, y0 - x, x0 + y, y0 - x);
-      }
-      
-      if (err <= 0)
-      {
-          y += 1;
-          err += 2*y + 1;
-      }
-     
-      if (err > 0)
-      {
-          x -= 1;
-          err -= 2*x + 1;
-      }
+      setPixel(x0 + x, y0 + y, true);
+      setPixel(x0 + y, y0 + x, true);
+      setPixel(x0 - y, y0 + x, true);
+      setPixel(x0 - x, y0 + y, true);
+      setPixel(x0 - x, y0 - y, true);
+      setPixel(x0 - y, y0 - x, true);
+      setPixel(x0 + y, y0 - x, true);
+      setPixel(x0 + x, y0 - y, true);
     }
+    else
+    {
+      drawLine(x0 + x, y0 + y, x0 - x, y0 + y);
+      drawLine(x0 + y, y0 + x, x0 - y, y0 + x);
+      drawLine(x0 - x, y0 - y, x0 + x, y0 - y);
+      drawLine(x0 - y, y0 - x, x0 + y, y0 - x);
+    }
+    
+    if (err <= 0)
+    {
+      y += 1;
+      err += 2*y + 1;
+    }
+     
+    if (err > 0)
+    {
+      x -= 1;
+      err -= 2*x + 1;
+    }
+  }
 } 
 
 /*----------------------------
