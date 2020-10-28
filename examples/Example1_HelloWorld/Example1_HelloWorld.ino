@@ -1,10 +1,10 @@
 /******************************************************************************
   Displays "Hello World" on the display
-  
+
   bernhard@generationmake.de
   Original Creation Date: Oct. 18, 2019
 
-  This code is Beerware; if you see me at the local, 
+  This code is Beerware; if you see me at the local,
   and you've found our code helpful, please buy us a round!
 
   Hardware Connections:
@@ -15,7 +15,7 @@
   A0    = 8
   RESET = 9
   Backlight (if needed) is connected via a transistor to pin 10)
-  
+
   Distributed as-is; no warranty is given.
 ******************************************************************************/
 #include <DogGraphicDisplay.h>

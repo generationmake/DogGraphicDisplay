@@ -10,7 +10,7 @@ This library supports the following displays:
  - DOGM132-5
  - DOGM128-6
  - DOGL128-6
- - DOGS102-6 
+ - DOGS102-6
 (controller ST7565 and UC1701).
 
 It supports hardware SPI and bit bang SPI and is tested with AVR, ESP32 and SAMD architecture.
