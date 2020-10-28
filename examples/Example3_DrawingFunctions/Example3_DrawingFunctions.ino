@@ -29,7 +29,7 @@ void setup() {
   DOG.drawRect(60, 20, 20, 10, true);
   DOG.drawRect(80, 40, 10, 20, false);
   DOG.drawCross(90, 20, 10, 10);
-	DOG.deleteCanvas();
+  DOG.deleteCanvas();
 }
 
 void loop() {

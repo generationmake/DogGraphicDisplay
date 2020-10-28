@@ -320,7 +320,7 @@ void DogGraphicDisplay::string(int column, byte page, const byte *font_adress, c
       else if((byte)*string < start_code || (byte)*string > last_code) //make sure data is valid
         string++;
       else
-      {					
+      {
         //calculate position of ascii character in font array
         //bytes for header + (ascii - startcode) * bytes per char)
         pos_array = 8 + (unsigned int)(*string++ - start_code) * bytes_p_char;
@@ -695,7 +695,7 @@ void DogGraphicDisplay::position(byte column, byte page)
 
   command(0x10 + (column>>4)); //MSB address column
   command(0x00 + (column&0x0F)); //LSB address column
-  command(0xB0 + (page&0x0F)); //address page	
+  command(0xB0 + (page&0x0F)); //address page
 }
 
 /*----------------------------
@@ -754,7 +754,7 @@ void DogGraphicDisplay::spi_initialize(byte cs, byte si, byte clk)
   digitalWrite(p_clk, HIGH);
   pinMode(p_clk, OUTPUT);
   if(hardware)
-  {	
+  {
     SPI.begin();
     SPI.setBitOrder(MSBFIRST);
     SPI.setDataMode(SPI_MODE3);
