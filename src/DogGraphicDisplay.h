@@ -15,6 +15,8 @@
 #ifndef DOGGRAPHICDISPLAY_H
 #define DOGGRAPHICDISPLAY_H
 
+#include <Arduino.h>
+
 #define DOGM128 1
 #define DOGL128 2
 #define DOGM132 3
@@ -52,6 +54,13 @@ class DogGraphicDisplay
     void rectangle (byte start_column, byte start_page, byte end_column, byte end_page, byte pattern);
     void picture (byte column, byte page, const byte *pic_adress);
     byte display_width (void);
+		void createCanvas(byte canvasSizeX, byte canvasSizeY, byte upperLeftX, byte upperLeftY);
+		void deleteCanvas();
+    void setPixel(int x, int y, bool value);
+    void drawLine(int x0, int y0, int x1, int y1);
+    void drawCircle(int x0, int y0, int r, bool fill); 
+    void drawRect(int x0, int y0, int width, int height, bool fill);
+    void drawCross(int x0, int y0, int width, int height);
 
   private:
     byte p_cs;
@@ -61,6 +70,11 @@ class DogGraphicDisplay
     byte type;
     boolean hardware;
     boolean top_view;
+
+		byte *canvas;
+
+		byte canvasSizeX, canvasSizeY, canvasPages;
+		byte canvasUpperLeftX, canvasUpperLeftY;
 
     void position (byte column, byte page);
     void command (byte dat);

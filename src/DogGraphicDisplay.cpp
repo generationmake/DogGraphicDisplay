@@ -46,20 +46,21 @@ DogGraphicDisplay::~DogGraphicDisplay()
 }
 
 /*-----------------------------
-Arduino begin function. Forward data to initialize function
+Arduino begin function. Forward data to initialize function and initialize canvas fullscreen
 */
 void DogGraphicDisplay::begin(byte p_cs, byte p_si, byte p_clk, byte p_a0, byte p_res, byte type) 
 {
-  initialize(p_cs, p_si, p_clk, p_a0, p_res, type);
+	initialize(p_cs, p_si, p_clk, p_a0, p_res, type);
 }
 
 /*-----------------------------
-Arduino end function. stop SPI if enabled
+Arduino end function. stop SPI if enabled and delete canvas memory area
 */
 void DogGraphicDisplay::end() 
 {
   if(hardware)
     SPI.end();
+	delete [] canvas;
 }
 
 /*----------------------------
@@ -450,6 +451,185 @@ byte DogGraphicDisplay::display_width (void)
     column_total = 102;
 
   return column_total;
+}
+
+/*----------------------------
+Func: createCanvas
+Desc: creates Canvas
+Vars: canvas size and point of upper left corner
+------------------------------*/
+void DogGraphicDisplay::createCanvas(byte canvasSizeX, byte canvasSizeY, byte upperLeftX, byte upperLeftY)
+{
+	this->canvasSizeX = canvasSizeX;
+	this->canvasSizeY = canvasSizeY;
+	this->canvasUpperLeftX = upperLeftX;
+	this->canvasUpperLeftY = upperLeftY;
+
+	byte rest = this->canvasSizeY % 8;
+
+	if(rest > 0)
+	{
+		for(int n = 1; n <= 8; n++)
+		{
+			int next = n * 8;
+			if(this->canvasSizeY < next)
+			{
+				this->canvasSizeY = next;
+				break;
+			}
+		}
+	}
+
+	canvasPages = this->canvasSizeY / 8;
+	canvas = new byte[canvasSizeX * canvasPages];
+
+
+	for(int x = 0; x < canvasSizeX; x++)
+	{
+		for(int page = 0; page < canvasPages; page ++)
+		{
+			canvas[page * canvasSizeX + x] = 0;
+		}
+	}
+}
+
+/*----------------------------
+Func: deleteCanvas
+Desc: deletes Canvas so memory is free again
+------------------------------*/
+void DogGraphicDisplay::deleteCanvas()
+{
+	delete[] canvas;
+}
+
+/*----------------------------
+Func: setPixel
+Desc: set single pixel value
+Vars: x, y coordinates, value(true = black, false = white
+------------------------------*/
+void DogGraphicDisplay::setPixel(int x, int y, bool value)
+{
+	x += canvasUpperLeftX;
+	y += canvasUpperLeftY;
+
+	if(x < canvasSizeX && y < canvasSizeY && x > canvasUpperLeftX && y > canvasUpperLeftY)
+	{
+
+		byte page = (y * canvasPages) / canvasSizeY;
+		y = y - 8 * page;
+		if(value)
+		{
+			canvas[page * canvasSizeX + x] |= (1<<y);
+		}
+		else
+		{
+			canvas[page * canvasSizeX + x] &= ~(1<<y);
+		}
+
+		rectangle(x, page, x, page, canvas[page * canvasSizeX + x]);
+	}
+}
+
+/*----------------------------
+Func: drawLine
+Desc: draw line on display
+Vars: start and end coordinates
+------------------------------*/
+void DogGraphicDisplay::drawLine(int x0, int y0, int x1, int y1)
+{
+  int dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
+  int dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; 
+  int err = (dx>dy ? dx : -dy)/2, e2;
+ 
+  for(;;){
+    setPixel(x0,y0, true);
+    if (x0==x1 && y0==y1) break;
+    e2 = err;
+    if (e2 >-dx) { err -= dy; x0 += sx; }
+    if (e2 < dy) { err += dx; y0 += sy; }
+  }
+}
+
+/*----------------------------
+Func: drawCircle
+Desc: draw circle on display
+Vars: center coordinates, radius, fill( true = filled, false = not filled )
+------------------------------*/
+void DogGraphicDisplay::drawCircle(int x0, int y0, int r, bool fill) 
+{ 
+    int x = r;
+    int y = 0;
+    int err = 0;
+ 
+    while (x >= y)
+    {
+      if(!fill) 
+      {
+        setPixel(x0 + x, y0 + y, true);
+        setPixel(x0 + y, y0 + x, true);
+        setPixel(x0 - y, y0 + x, true);
+        setPixel(x0 - x, y0 + y, true);
+        setPixel(x0 - x, y0 - y, true);
+        setPixel(x0 - y, y0 - x, true);
+        setPixel(x0 + y, y0 - x, true);
+        setPixel(x0 + x, y0 - y, true);
+      }
+      else
+      {
+        drawLine(x0 + x, y0 + y, x0 - x, y0 + y);
+        drawLine(x0 + y, y0 + x, x0 - y, y0 + x);
+        drawLine(x0 - x, y0 - y, x0 + x, y0 - y);
+        drawLine(x0 - y, y0 - x, x0 + y, y0 - x);
+      }
+      
+      if (err <= 0)
+      {
+          y += 1;
+          err += 2*y + 1;
+      }
+     
+      if (err > 0)
+      {
+          x -= 1;
+          err -= 2*x + 1;
+      }
+    }
+} 
+
+/*----------------------------
+Func: drawRect
+Desc: draw rectangle on display
+Vars: coordinates of upper left corner, width and height, fill( true = filled, false = not filled )
+------------------------------*/
+void DogGraphicDisplay::drawRect(int x0, int y0, int width, int height, bool fill)
+{
+  if(!fill)
+  {
+    drawLine(x0, y0, x0 + width, y0);
+    drawLine(x0, y0 + height, x0 + width, y0 + height);
+    drawLine(x0, y0, x0, y0 + height);
+    drawLine(x0 + width, y0, x0 + width, y0 + height);
+  }
+  else
+  {
+    for(int y = y0; y <= y0 + height; y++)
+    {
+      drawLine(x0, y, x0 + width, y);
+    }
+  }
+}
+
+/*----------------------------
+Func: drawCross
+Desc: draw X on display
+Vars: center coordinates, width and height
+------------------------------*/
+void DogGraphicDisplay::drawCross(int x0, int y0, int width, int height)
+{
+  drawLine(x0, y0, x0 + width, y0 + height);
+  drawLine(x0, y0, x0 + width, y0 - height);
+  drawLine(x0, y0, x0 - width, y0 + height);
+  drawLine(x0, y0, x0 - width, y0 - height);
 }
 
 //----------------------------------------------------private Functions----------------------------------------------------
