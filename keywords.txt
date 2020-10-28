@@ -22,6 +22,13 @@ string	KEYWORD2
 rectangle	KEYWORD2  
 picture	KEYWORD2     
 display_width	KEYWORD2     
+createCanvas	KEYWORD2     
+deleteCanvas	KEYWORD2     
+setPixel	KEYWORD2     
+drawLine	KEYWORD2     
+drawCircle	KEYWORD2     
+drawRect	KEYWORD2     
+drawCross	KEYWORD2     
 
 
 #######################################
