@@ -1,4 +1,8 @@
-# DogGraphicDisplay
+`DogGraphicDisplay`
+===================
+
+[![General Formatting Checks](https://github.com/generationmake/DogGraphicDisplay/workflows/General%20Formatting%20Checks/badge.svg)](https://github.com/generationmake/DogGraphicDisplay/actions?workflow=General+Formatting+Checks)
+[![Spell Check](https://github.com/generationmake/DogGraphicDisplay/workflows/Spell%20Check/badge.svg)](https://github.com/generationmake/DogGraphicDisplay/actions?workflow=Spell+Check)
 
 Arduino library for EA DOG graphic displays: https://www.lcd-module.com/produkte/dog.html
 
