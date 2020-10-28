@@ -216,7 +216,7 @@ void DogGraphicDisplay::sleep(bool state)
 /*----------------------------
 Func: string
 Desc: shows string with selected font on position
-Vars: column (0..127/131), page(0..3/7),  font adress in programm memory, stringarray
+Vars: column (0..127/131), page(0..3/7),  font address in program memory, stringarray
 ------------------------------*/
 void DogGraphicDisplay::string(int column, byte page, const byte *font_adress, const char *str)
 {
@@ -226,7 +226,7 @@ void DogGraphicDisplay::string(int column, byte page, const byte *font_adress, c
 /*----------------------------
 Func: string
 Desc: shows string with selected font on position with align
-Vars: column (0..127/131), page(0..3/7),  font adress in programm memory, stringarray
+Vars: column (0..127/131), page(0..3/7),  font address in program memory, stringarray
 ------------------------------*/
 void DogGraphicDisplay::string(int column, byte page, const byte *font_adress, const char *str, byte align)
 {
@@ -236,13 +236,13 @@ void DogGraphicDisplay::string(int column, byte page, const byte *font_adress, c
 /*----------------------------
 Func: string
 Desc: shows string with selected font on position with align and style
-Vars: column (0..127/131), page(0..3/7),  font adress in programm memory, stringarray, align, style
+Vars: column (0..127/131), page(0..3/7),  font address in program memory, stringarray, align, style
 ------------------------------*/
 void DogGraphicDisplay::string(int column, byte page, const byte *font_adress, const char *str, byte align, byte style)
 {
-  unsigned int pos_array;  //Postion of character data in memory array
-  byte x, y, width_max,width_min;  //temporary column and page adress, couloumn_cnt tand width_max are used to stay inside display area
-  int column_cnt;  //temporary column and page adress, couloumn_cnt tand width_max are used to stay inside display area
+  unsigned int pos_array;  //Position of character data in memory array
+  byte x, y, width_max,width_min;  //temporary column and page address, couloumn_cnt tand width_max are used to stay inside display area
+  int column_cnt;  //temporary column and page address, couloumn_cnt tand width_max are used to stay inside display area
   byte start_code, last_code, width, page_height, bytes_p_char;	//font information, needed for calculation
   const char *string;
   int stringwidth=0; // width of string in pixels
@@ -321,7 +321,7 @@ void DogGraphicDisplay::string(int column, byte page, const byte *font_adress, c
         string++;
       else
       {							
-        //calculate positon of ascii character in font array
+        //calculate position of ascii character in font array
         //bytes for header + (ascii - startcode) * bytes per char)
         pos_array = 8 + (unsigned int)(*string++ - start_code) * bytes_p_char;
         pos_array += y*width; //get the dot pattern for the part of the char to print
@@ -394,7 +394,7 @@ void DogGraphicDisplay::rectangle(byte start_column, byte start_page, byte end_c
 /*----------------------------
 Func: picture
 Desc: shows a BLH-picture on the display (see BitMapEdit EA LCD-Tools (http://www.lcd-module.de/support.html))
-Vars: column (0..127/131) and page(0..3/7), program memory adress of data
+Vars: column (0..127/131) and page(0..3/7), program memory address of data
 ------------------------------*/
 void DogGraphicDisplay::picture(byte column, byte page, const byte *pic_adress)  
 {
@@ -440,7 +440,7 @@ void DogGraphicDisplay::picture(byte column, byte page, const byte *pic_adress)
 /*----------------------------
 Func: picture with style
 Desc: shows a BLH-picture on the display (see BitMapEdit EA LCD-Tools (http://www.lcd-module.de/support.html))
-Vars: column (0..127/131) and page(0..3/7), program memory adress of data
+Vars: column (0..127/131) and page(0..3/7), program memory address of data
 ------------------------------*/
 void DogGraphicDisplay::picture(byte column, byte page, const byte *pic_adress, byte style)  
 {
@@ -693,9 +693,9 @@ void DogGraphicDisplay::position(byte column, byte page)
   if(top_view && type != DOGM132)
     column += 4;
 
-  command(0x10 + (column>>4)); //MSB adress column
-  command(0x00 + (column&0x0F)); //LSB adress column
-  command(0xB0 + (page&0x0F)); //adress page	
+  command(0x10 + (column>>4)); //MSB address column
+  command(0x00 + (column&0x0F)); //LSB address column
+  command(0xB0 + (page&0x0F)); //address page	
 }
 
 /*----------------------------
