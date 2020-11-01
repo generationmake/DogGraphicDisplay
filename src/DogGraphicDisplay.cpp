@@ -521,7 +521,7 @@ Func: createCanvas
 Desc: creates Canvas
 Vars: canvas size and point of upper left corner, y-direction page aligned
 ------------------------------*/
-void DogGraphicDisplay::createCanvas(byte canvasSizeX, byte canvasSizeY, byte upperLeftX, byte upperLeftY)
+void DogGraphicDisplay::createCanvas(byte canvasSizeX, byte canvasSizeY, int upperLeftX, int upperLeftY)
 {
   createCanvas(canvasSizeX, canvasSizeY, upperLeftX, upperLeftY, 0);
 }
@@ -531,7 +531,7 @@ Func: createCanvas
 Desc: creates Canvas
 Vars: canvas size and point of upper left corner, y-direction page aligned, drawMode (0=direct to display, other=buffered)
 ------------------------------*/
-void DogGraphicDisplay::createCanvas(byte canvasSizeX, byte canvasSizeY, byte upperLeftX, byte upperLeftY, byte drawMode)
+void DogGraphicDisplay::createCanvas(byte canvasSizeX, byte canvasSizeY, int upperLeftX, int upperLeftY, byte drawMode)
 {
   this->canvasSizeX = canvasSizeX;
   this->canvasSizeY = canvasSizeY;
@@ -602,7 +602,7 @@ void DogGraphicDisplay::setPixel(int x, int y, bool value)
 
     if(drawMode==0) 
     {
-      if((x+canvasUpperLeftX)<display_width()&&(page+canvasUpperLeftY)<page_cnt())  // check if pixel is within display
+      if((x+canvasUpperLeftX)>=0&&(x+canvasUpperLeftX)<display_width()&&(page+canvasUpperLeftY)>=0&&(page+canvasUpperLeftY)<page_cnt())  // check if pixel is within display
       {
         rectangle(x+canvasUpperLeftX, page+canvasUpperLeftY, x+canvasUpperLeftX, page+canvasUpperLeftY, canvas[page * canvasSizeX + x]);
       }
@@ -749,13 +749,19 @@ void DogGraphicDisplay::flushCanvas(void)
 {
   for(int page = 0; page < canvasPages; page++)
   {
-    if((page+canvasUpperLeftY)<page_cnt())  // check if page is within display
+    if((page+canvasUpperLeftY)>=0&&(page+canvasUpperLeftY)<page_cnt())  // check if page is within display
     {
-      position(canvasUpperLeftX, page+canvasUpperLeftY);
+      int x=0;
+      if(canvasUpperLeftX>=0) position(canvasUpperLeftX, page+canvasUpperLeftY);
+      else 
+      {
+        position(0, page+canvasUpperLeftY);
+        x=-canvasUpperLeftX;
+      }
       digitalWrite(p_a0, HIGH);
       digitalWrite(p_cs, LOW);
 
-      for(int x = 0; ((x < canvasSizeX)&&((x+canvasUpperLeftX)<display_width())); x++)  // also check if x is within display
+      for( ; ((x < canvasSizeX)&&((x+canvasUpperLeftX)<display_width())); x++)  // also check if x is within display
       {
         spi_out(canvas[page * canvasSizeX + x]);
       }
