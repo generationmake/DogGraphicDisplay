@@ -504,7 +504,7 @@ byte DogGraphicDisplay::display_width (void)
 /*----------------------------
 Func: createCanvas
 Desc: creates Canvas
-Vars: canvas size and point of upper left corner
+Vars: canvas size and point of upper left corner, y-direction page aligned
 ------------------------------*/
 void DogGraphicDisplay::createCanvas(byte canvasSizeX, byte canvasSizeY, byte upperLeftX, byte upperLeftY)
 {
@@ -514,7 +514,7 @@ void DogGraphicDisplay::createCanvas(byte canvasSizeX, byte canvasSizeY, byte up
 /*----------------------------
 Func: createCanvas
 Desc: creates Canvas
-Vars: canvas size and point of upper left corner, drawMode (0=direct to display, other=buffered)
+Vars: canvas size and point of upper left corner, y-direction page aligned, drawMode (0=direct to display, other=buffered)
 ------------------------------*/
 void DogGraphicDisplay::createCanvas(byte canvasSizeX, byte canvasSizeY, byte upperLeftX, byte upperLeftY, byte drawMode)
 {
@@ -571,8 +571,7 @@ void DogGraphicDisplay::setPixel(int x, int y, bool value)
 //  x += canvasUpperLeftX;
 //  y += canvasUpperLeftY;
 
-//  if(x < canvasSizeX && y < canvasSizeY && x > canvasUpperLeftX && y > canvasUpperLeftY)
-  if(x < canvasSizeX && y < canvasSizeY)
+  if(x < canvasSizeX && y < canvasSizeY && x >= 0 && y >= 0) // check if pixel is within canvas
   {
 
     byte page = (y * canvasPages) / canvasSizeY;
@@ -586,7 +585,7 @@ void DogGraphicDisplay::setPixel(int x, int y, bool value)
       canvas[page * canvasSizeX + x] &= ~(1<<y);
     }
 
-    if(drawMode==0) rectangle(x+canvasUpperLeftX, page, x+canvasUpperLeftX, page, canvas[page * canvasSizeX + x]);
+    if(drawMode==0) rectangle(x+canvasUpperLeftX, page+canvasUpperLeftY, x+canvasUpperLeftX, page+canvasUpperLeftY, canvas[page * canvasSizeX + x]);
   }
 }
 
@@ -727,11 +726,9 @@ Vars: none
 ------------------------------*/
 void DogGraphicDisplay::flushCanvas(void)
 {
-//  y += canvasUpperLeftY;
-
   for(int page = 0; page < canvasPages; page++)
   {
-    position(canvasUpperLeftX, page);
+    position(canvasUpperLeftX, page+canvasUpperLeftY);
     digitalWrite(p_a0, HIGH);
     digitalWrite(p_cs, LOW);
 
