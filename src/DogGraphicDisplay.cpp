@@ -568,10 +568,11 @@ Vars: x, y coordinates, value(true = black, false = white
 ------------------------------*/
 void DogGraphicDisplay::setPixel(int x, int y, bool value)
 {
-  x += canvasUpperLeftX;
-  y += canvasUpperLeftY;
+//  x += canvasUpperLeftX;
+//  y += canvasUpperLeftY;
 
-  if(x < canvasSizeX && y < canvasSizeY && x > canvasUpperLeftX && y > canvasUpperLeftY)
+//  if(x < canvasSizeX && y < canvasSizeY && x > canvasUpperLeftX && y > canvasUpperLeftY)
+  if(x < canvasSizeX && y < canvasSizeY)
   {
 
     byte page = (y * canvasPages) / canvasSizeY;
@@ -585,7 +586,7 @@ void DogGraphicDisplay::setPixel(int x, int y, bool value)
       canvas[page * canvasSizeX + x] &= ~(1<<y);
     }
 
-    if(drawMode==0) rectangle(x, page, x, page, canvas[page * canvasSizeX + x]);
+    if(drawMode==0) rectangle(x+canvasUpperLeftX, page, x+canvasUpperLeftX, page, canvas[page * canvasSizeX + x]);
   }
 }
 
@@ -726,9 +727,11 @@ Vars: none
 ------------------------------*/
 void DogGraphicDisplay::flushCanvas(void)
 {
+//  y += canvasUpperLeftY;
+
   for(int page = 0; page < canvasPages; page++)
   {
-    position(0, page);
+    position(canvasUpperLeftX, page);
     digitalWrite(p_a0, HIGH);
     digitalWrite(p_cs, LOW);
 
