@@ -718,10 +718,8 @@ Vars: center coordinates, width and height
 ------------------------------*/
 void DogGraphicDisplay::drawCross(int x0, int y0, int width, int height)
 {
-  drawLine(x0, y0, x0 + width, y0 + height);
-  drawLine(x0, y0, x0 + width, y0 - height);
-  drawLine(x0, y0, x0 - width, y0 + height);
-  drawLine(x0, y0, x0 - width, y0 - height);
+  drawLine(x0 - width, y0 - height, x0 + width, y0 + height);
+  drawLine(x0 - width, y0 + height, x0 + width, y0 - height);
 }
 
 /*----------------------------
