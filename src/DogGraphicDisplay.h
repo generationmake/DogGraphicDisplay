@@ -62,6 +62,7 @@ class DogGraphicDisplay
     void drawCircle(int x0, int y0, int r, bool fill);
     void drawRect(int x0, int y0, int width, int height, bool fill);
     void drawCross(int x0, int y0, int width, int height);
+    void clearCanvas(void);
 
   private:
     byte p_cs;

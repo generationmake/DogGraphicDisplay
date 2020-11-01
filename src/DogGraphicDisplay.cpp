@@ -680,6 +680,22 @@ void DogGraphicDisplay::drawCross(int x0, int y0, int width, int height)
   drawLine(x0, y0, x0 - width, y0 - height);
 }
 
+/*----------------------------
+Func: clearCanvas
+Desc: sets all pixel of the canvas to 0
+Vars: none
+------------------------------*/
+void DogGraphicDisplay::clearCanvas(void)
+{
+  for(int x = 0; x < canvasSizeX; x++)
+  {
+    for(int y = 0; y < canvasSizeY; y++)
+    {
+      setPixel(x,y,0);
+    }
+  }
+}
+
 //----------------------------------------------------private Functions----------------------------------------------------
 //normally you don't need those functions in your sketch
 
