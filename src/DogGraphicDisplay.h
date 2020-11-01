@@ -66,6 +66,7 @@ class DogGraphicDisplay
     void drawRect(int x0, int y0, int width, int height, bool fill);
     void drawCross(int x0, int y0, int width, int height);
     void clearCanvas(void);
+    void flushCanvas(int upperLeftX, int upperLeftY);
     void flushCanvas(void);
 
   private:

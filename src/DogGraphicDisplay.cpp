@@ -741,6 +741,18 @@ void DogGraphicDisplay::clearCanvas(void)
 /*----------------------------
 Func: flushCanvas
 Desc: sends all pixel of the canvas to the display
+Vars: coordinates of upper left corner
+------------------------------*/
+void DogGraphicDisplay::flushCanvas(int upperLeftX, int upperLeftY)
+{
+  this->canvasUpperLeftX = upperLeftX;
+  this->canvasUpperLeftY = upperLeftY;
+  flushCanvas();
+}
+
+/*----------------------------
+Func: flushCanvas
+Desc: sends all pixel of the canvas to the display
 Vars: none
 ------------------------------*/
 void DogGraphicDisplay::flushCanvas(void)
