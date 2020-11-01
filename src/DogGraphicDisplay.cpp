@@ -508,10 +508,21 @@ Vars: canvas size and point of upper left corner
 ------------------------------*/
 void DogGraphicDisplay::createCanvas(byte canvasSizeX, byte canvasSizeY, byte upperLeftX, byte upperLeftY)
 {
+  createCanvas(canvasSizeX, canvasSizeY, upperLeftX, upperLeftY, 0);
+}
+
+/*----------------------------
+Func: createCanvas
+Desc: creates Canvas
+Vars: canvas size and point of upper left corner, drawMode (0=direct to display, other=buffered)
+------------------------------*/
+void DogGraphicDisplay::createCanvas(byte canvasSizeX, byte canvasSizeY, byte upperLeftX, byte upperLeftY, byte drawMode)
+{
   this->canvasSizeX = canvasSizeX;
   this->canvasSizeY = canvasSizeY;
   this->canvasUpperLeftX = upperLeftX;
   this->canvasUpperLeftY = upperLeftY;
+  this->drawMode = drawMode;
 
   byte rest = this->canvasSizeY % 8;
 
@@ -574,7 +585,7 @@ void DogGraphicDisplay::setPixel(int x, int y, bool value)
       canvas[page * canvasSizeX + x] &= ~(1<<y);
     }
 
-    rectangle(x, page, x, page, canvas[page * canvasSizeX + x]);
+    if(drawMode==0) rectangle(x, page, x, page, canvas[page * canvasSizeX + x]);
   }
 }
 
@@ -693,6 +704,28 @@ void DogGraphicDisplay::clearCanvas(void)
     {
       setPixel(x,y,0);
     }
+  }
+}
+
+/*----------------------------
+Func: flushCanvas
+Desc: sends all pixel of the canvas to the display
+Vars: none
+------------------------------*/
+void DogGraphicDisplay::flushCanvas(void)
+{
+  for(int page = 0; page < canvasPages; page++)
+  {
+    position(0, page);
+    digitalWrite(p_a0, HIGH);
+    digitalWrite(p_cs, LOW);
+
+    for(int x = 0; x < canvasSizeX; x++)
+    {
+      spi_out(canvas[page * canvasSizeX + x]);
+    }
+
+    digitalWrite(p_cs, HIGH);
   }
 }
 
