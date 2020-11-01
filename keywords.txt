@@ -29,6 +29,8 @@ drawLine	KEYWORD2
 drawCircle	KEYWORD2
 drawRect	KEYWORD2
 drawCross	KEYWORD2
+clearCanvas	KEYWORD2
+flushCanvas	KEYWORD2
 
 
 #######################################
