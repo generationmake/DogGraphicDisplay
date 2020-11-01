@@ -3,10 +3,10 @@
 #define DENSE_NUMBERS_8_LEN 78
 #if defined(ARDUINO_ARCH_AVR)
   // AVR-specific code
-const byte DENSE_NUMBERS_8[DENSE_NUMBERS_8_LEN] __attribute__((section(".progmem.data"))) = 
+const byte DENSE_NUMBERS_8[DENSE_NUMBERS_8_LEN] __attribute__((section(".progmem.data"))) =
 #else
   // generic, non-platform specific code
-const byte DENSE_NUMBERS_8[DENSE_NUMBERS_8_LEN] = 
+const byte DENSE_NUMBERS_8[DENSE_NUMBERS_8_LEN] =
 #endif
 {
 70,86,0x2D,0x3A,5,8,1,5,
