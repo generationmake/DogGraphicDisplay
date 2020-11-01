@@ -600,7 +600,7 @@ void DogGraphicDisplay::setPixel(int x, int y, bool value)
       canvas[page * canvasSizeX + x] &= ~(1<<y);
     }
 
-    if(drawMode==0) 
+    if(drawMode==0)
     {
       if((x+canvasUpperLeftX)>=0&&(x+canvasUpperLeftX)<display_width()&&(page+canvasUpperLeftY)>=0&&(page+canvasUpperLeftY)<page_cnt())  // check if pixel is within display
       {
@@ -763,7 +763,7 @@ void DogGraphicDisplay::flushCanvas(void)
     {
       int x=0;
       if(canvasUpperLeftX>=0) position(canvasUpperLeftX, page+canvasUpperLeftY);
-      else 
+      else
       {
         position(0, page+canvasUpperLeftY);
         x=-canvasUpperLeftX;
