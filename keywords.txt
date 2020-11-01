@@ -26,6 +26,7 @@ createCanvas	KEYWORD2
 deleteCanvas	KEYWORD2
 setPixel	KEYWORD2
 drawLine	KEYWORD2
+drawArrow	KEYWORD2
 drawCircle	KEYWORD2
 drawRect	KEYWORD2
 drawCross	KEYWORD2

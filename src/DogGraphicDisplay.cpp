@@ -610,6 +610,18 @@ void DogGraphicDisplay::drawLine(int x0, int y0, int x1, int y1)
 }
 
 /*----------------------------
+Func: drawArrow
+Desc: draw arrow on display
+Vars: start and end coordinates, the head is at the end coordinates
+------------------------------*/
+void DogGraphicDisplay::drawArrow(int x0, int y0, int x1, int y1)
+{
+  drawLine(x0,y0,x1,y1);
+  drawLine(x1-(x1-x0)/6-(y1-y0)/6,y1-(y1-y0)/6+(x1-x0)/6,x1,y1);
+  drawLine(x1-(x1-x0)/6+(y1-y0)/6,y1-(y1-y0)/6-(x1-x0)/6,x1,y1);
+}
+
+/*----------------------------
 Func: drawCircle
 Desc: draw circle on display
 Vars: center coordinates, radius, fill( true = filled, false = not filled )
