@@ -500,6 +500,21 @@ byte DogGraphicDisplay::display_width (void)
 
   return column_total;
 }
+/*----------------------------
+Func: page_cnt
+Desc: returns the page count of the display
+Vars: none
+------------------------------*/
+byte DogGraphicDisplay::page_cnt(void)
+{
+  byte page_cnt = 8;
+
+  if(type == DOGM132)
+  {
+    page_cnt = 4;
+  }
+  return page_cnt;
+}
 
 /*----------------------------
 Func: createCanvas
@@ -585,7 +600,13 @@ void DogGraphicDisplay::setPixel(int x, int y, bool value)
       canvas[page * canvasSizeX + x] &= ~(1<<y);
     }
 
-    if(drawMode==0) rectangle(x+canvasUpperLeftX, page+canvasUpperLeftY, x+canvasUpperLeftX, page+canvasUpperLeftY, canvas[page * canvasSizeX + x]);
+    if(drawMode==0) 
+    {
+      if((x+canvasUpperLeftX)<display_width()&&(page+canvasUpperLeftY)<page_cnt())  // check if pixel is within display
+      {
+        rectangle(x+canvasUpperLeftX, page+canvasUpperLeftY, x+canvasUpperLeftX, page+canvasUpperLeftY, canvas[page * canvasSizeX + x]);
+      }
+    }
   }
 }
 
@@ -728,16 +749,19 @@ void DogGraphicDisplay::flushCanvas(void)
 {
   for(int page = 0; page < canvasPages; page++)
   {
-    position(canvasUpperLeftX, page+canvasUpperLeftY);
-    digitalWrite(p_a0, HIGH);
-    digitalWrite(p_cs, LOW);
-
-    for(int x = 0; x < canvasSizeX; x++)
+    if((page+canvasUpperLeftY)<page_cnt())  // check if page is within display
     {
-      spi_out(canvas[page * canvasSizeX + x]);
-    }
+      position(canvasUpperLeftX, page+canvasUpperLeftY);
+      digitalWrite(p_a0, HIGH);
+      digitalWrite(p_cs, LOW);
 
-    digitalWrite(p_cs, HIGH);
+      for(int x = 0; ((x < canvasSizeX)&&((x+canvasUpperLeftX)<display_width())); x++)  // also check if x is within display
+      {
+        spi_out(canvas[page * canvasSizeX + x]);
+      }
+
+      digitalWrite(p_cs, HIGH);
+    }
   }
 }
 

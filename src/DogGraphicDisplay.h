@@ -55,6 +55,7 @@ class DogGraphicDisplay
     void picture (byte column, byte page, const byte *pic_adress);
     void picture (byte column, byte page, const byte *pic_adress, byte style);
     byte display_width (void);
+    byte page_cnt (void);
     void createCanvas(byte canvasSizeX, byte canvasSizeY, byte upperLeftX, byte upperLeftY);
     void createCanvas(byte canvasSizeX, byte canvasSizeY, byte upperLeftX, byte upperLeftY, byte drawMode);
     void deleteCanvas();

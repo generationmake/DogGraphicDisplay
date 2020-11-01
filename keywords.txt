@@ -22,6 +22,7 @@ string	KEYWORD2
 rectangle	KEYWORD2
 picture	KEYWORD2
 display_width	KEYWORD2
+page_cnt	KEYWORD2
 createCanvas	KEYWORD2
 deleteCanvas	KEYWORD2
 setPixel	KEYWORD2
