@@ -500,18 +500,44 @@ byte DogGraphicDisplay::display_width (void)
 
   return column_total;
 }
+/*----------------------------
+Func: page_cnt
+Desc: returns the page count of the display
+Vars: none
+------------------------------*/
+byte DogGraphicDisplay::page_cnt(void)
+{
+  byte page_cnt = 8;
+
+  if(type == DOGM132)
+  {
+    page_cnt = 4;
+  }
+  return page_cnt;
+}
 
 /*----------------------------
 Func: createCanvas
 Desc: creates Canvas
-Vars: canvas size and point of upper left corner
+Vars: canvas size and point of upper left corner, y-direction page aligned
 ------------------------------*/
-void DogGraphicDisplay::createCanvas(byte canvasSizeX, byte canvasSizeY, byte upperLeftX, byte upperLeftY)
+void DogGraphicDisplay::createCanvas(byte canvasSizeX, byte canvasSizeY, int upperLeftX, int upperLeftY)
+{
+  createCanvas(canvasSizeX, canvasSizeY, upperLeftX, upperLeftY, 0);
+}
+
+/*----------------------------
+Func: createCanvas
+Desc: creates Canvas
+Vars: canvas size and point of upper left corner, y-direction page aligned, drawMode (0=direct to display, other=buffered)
+------------------------------*/
+void DogGraphicDisplay::createCanvas(byte canvasSizeX, byte canvasSizeY, int upperLeftX, int upperLeftY, byte drawMode)
 {
   this->canvasSizeX = canvasSizeX;
   this->canvasSizeY = canvasSizeY;
   this->canvasUpperLeftX = upperLeftX;
   this->canvasUpperLeftY = upperLeftY;
+  this->drawMode = drawMode;
 
   byte rest = this->canvasSizeY % 8;
 
@@ -557,10 +583,10 @@ Vars: x, y coordinates, value(true = black, false = white
 ------------------------------*/
 void DogGraphicDisplay::setPixel(int x, int y, bool value)
 {
-  x += canvasUpperLeftX;
-  y += canvasUpperLeftY;
+//  x += canvasUpperLeftX;
+//  y += canvasUpperLeftY;
 
-  if(x < canvasSizeX && y < canvasSizeY && x > canvasUpperLeftX && y > canvasUpperLeftY)
+  if(x < canvasSizeX && y < canvasSizeY && x >= 0 && y >= 0) // check if pixel is within canvas
   {
 
     byte page = (y * canvasPages) / canvasSizeY;
@@ -574,7 +600,13 @@ void DogGraphicDisplay::setPixel(int x, int y, bool value)
       canvas[page * canvasSizeX + x] &= ~(1<<y);
     }
 
-    rectangle(x, page, x, page, canvas[page * canvasSizeX + x]);
+    if(drawMode==0)
+    {
+      if((x+canvasUpperLeftX)>=0&&(x+canvasUpperLeftX)<display_width()&&(page+canvasUpperLeftY)>=0&&(page+canvasUpperLeftY)<page_cnt())  // check if pixel is within display
+      {
+        rectangle(x+canvasUpperLeftX, page+canvasUpperLeftY, x+canvasUpperLeftX, page+canvasUpperLeftY, canvas[page * canvasSizeX + x]);
+      }
+    }
   }
 }
 
@@ -596,6 +628,18 @@ void DogGraphicDisplay::drawLine(int x0, int y0, int x1, int y1)
     if (e2 >-dx) { err -= dy; x0 += sx; }
     if (e2 < dy) { err += dx; y0 += sy; }
   }
+}
+
+/*----------------------------
+Func: drawArrow
+Desc: draw arrow on display
+Vars: start and end coordinates, the head is at the end coordinates
+------------------------------*/
+void DogGraphicDisplay::drawArrow(int x0, int y0, int x1, int y1)
+{
+  drawLine(x0,y0,x1,y1);
+  drawLine(x1-(x1-x0)/6-(y1-y0)/6,y1-(y1-y0)/6+(x1-x0)/6,x1,y1);
+  drawLine(x1-(x1-x0)/6+(y1-y0)/6,y1-(y1-y0)/6-(x1-x0)/6,x1,y1);
 }
 
 /*----------------------------
@@ -674,10 +718,67 @@ Vars: center coordinates, width and height
 ------------------------------*/
 void DogGraphicDisplay::drawCross(int x0, int y0, int width, int height)
 {
-  drawLine(x0, y0, x0 + width, y0 + height);
-  drawLine(x0, y0, x0 + width, y0 - height);
-  drawLine(x0, y0, x0 - width, y0 + height);
-  drawLine(x0, y0, x0 - width, y0 - height);
+  drawLine(x0 - width, y0 - height, x0 + width, y0 + height);
+  drawLine(x0 - width, y0 + height, x0 + width, y0 - height);
+}
+
+/*----------------------------
+Func: clearCanvas
+Desc: sets all pixel of the canvas to 0
+Vars: none
+------------------------------*/
+void DogGraphicDisplay::clearCanvas(void)
+{
+  for(int x = 0; x < canvasSizeX; x++)
+  {
+    for(int y = 0; y < canvasSizeY; y++)
+    {
+      setPixel(x,y,0);
+    }
+  }
+}
+
+/*----------------------------
+Func: flushCanvas
+Desc: sends all pixel of the canvas to the display
+Vars: coordinates of upper left corner
+------------------------------*/
+void DogGraphicDisplay::flushCanvas(int upperLeftX, int upperLeftY)
+{
+  this->canvasUpperLeftX = upperLeftX;
+  this->canvasUpperLeftY = upperLeftY;
+  flushCanvas();
+}
+
+/*----------------------------
+Func: flushCanvas
+Desc: sends all pixel of the canvas to the display
+Vars: none
+------------------------------*/
+void DogGraphicDisplay::flushCanvas(void)
+{
+  for(int page = 0; page < canvasPages; page++)
+  {
+    if((page+canvasUpperLeftY)>=0&&(page+canvasUpperLeftY)<page_cnt())  // check if page is within display
+    {
+      int x=0;
+      if(canvasUpperLeftX>=0) position(canvasUpperLeftX, page+canvasUpperLeftY);
+      else
+      {
+        position(0, page+canvasUpperLeftY);
+        x=-canvasUpperLeftX;
+      }
+      digitalWrite(p_a0, HIGH);
+      digitalWrite(p_cs, LOW);
+
+      for( ; ((x < canvasSizeX)&&((x+canvasUpperLeftX)<display_width())); x++)  // also check if x is within display
+      {
+        spi_out(canvas[page * canvasSizeX + x]);
+      }
+
+      digitalWrite(p_cs, HIGH);
+    }
+  }
 }
 
 //----------------------------------------------------private Functions----------------------------------------------------

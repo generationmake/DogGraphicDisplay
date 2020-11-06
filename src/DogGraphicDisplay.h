@@ -55,13 +55,19 @@ class DogGraphicDisplay
     void picture (byte column, byte page, const byte *pic_adress);
     void picture (byte column, byte page, const byte *pic_adress, byte style);
     byte display_width (void);
-    void createCanvas(byte canvasSizeX, byte canvasSizeY, byte upperLeftX, byte upperLeftY);
+    byte page_cnt (void);
+    void createCanvas(byte canvasSizeX, byte canvasSizeY, int upperLeftX, int upperLeftY);
+    void createCanvas(byte canvasSizeX, byte canvasSizeY, int upperLeftX, int upperLeftY, byte drawMode);
     void deleteCanvas();
     void setPixel(int x, int y, bool value);
     void drawLine(int x0, int y0, int x1, int y1);
+    void drawArrow(int x0, int y0, int x1, int y1);
     void drawCircle(int x0, int y0, int r, bool fill);
     void drawRect(int x0, int y0, int width, int height, bool fill);
     void drawCross(int x0, int y0, int width, int height);
+    void clearCanvas(void);
+    void flushCanvas(int upperLeftX, int upperLeftY);
+    void flushCanvas(void);
 
   private:
     byte p_cs;
@@ -74,8 +80,9 @@ class DogGraphicDisplay
 
     byte *canvas;
 
+    byte drawMode;
     byte canvasSizeX, canvasSizeY, canvasPages;
-    byte canvasUpperLeftX, canvasUpperLeftY;
+    int canvasUpperLeftX, canvasUpperLeftY;
 
     void position (byte column, byte page);
     void command (byte dat);
