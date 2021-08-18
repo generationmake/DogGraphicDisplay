@@ -857,9 +857,13 @@ void DogGraphicDisplay::spi_initialize(byte cs, byte si, byte clk)
   if(hardware)
   {
     SPI.begin();
+#ifdef ARDUINO_ARCH_MBED
+    SPI.beginTransaction(SPISettings(10*1000*1000, MSBFIRST, SPI_MODE3)); /* SPI CLK = 10 MHz */
+#else
     SPI.setBitOrder(MSBFIRST);
     SPI.setDataMode(SPI_MODE3);
     SPI.setClockDivider(SPI_CLOCK_DIV4);
+#endif /* ARDUINO_ARCH_MBED */
   }
 }
 
