@@ -16,6 +16,7 @@
 #define DOGGRAPHICDISPLAY_H
 
 #include <Arduino.h>
+#include <SPI.h>
 
 #define DOGM128 1
 #define DOGL128 2
@@ -40,6 +41,7 @@ class DogGraphicDisplay
     DogGraphicDisplay ();
     ~DogGraphicDisplay ();
     void begin (byte p_cs, byte p_si, byte p_clk, byte p_a0, byte p_res, byte type);
+    void begin (SPIClass *port, byte p_cs, byte p_a0, byte p_res, byte type);
     void end ();
     void initialize (byte p_cs, byte p_si, byte p_clk, byte p_a0, byte p_res, byte type);
     void clear (void);
@@ -77,6 +79,7 @@ class DogGraphicDisplay
     byte type;
     boolean hardware;
     boolean top_view;
+    SPIClass *spi_port;
 
     byte *canvas;
 
@@ -89,6 +92,7 @@ class DogGraphicDisplay
     void data (byte dat);
 
     void spi_initialize (byte cs, byte si, byte clk);
+    void spi_initialize_h (SPIClass *port, byte cs);
     void spi_put_byte (byte dat);
     void spi_put (byte *dat, int len);
     void spi_out (byte dat);
