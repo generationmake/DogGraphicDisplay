@@ -53,6 +53,44 @@ void DogGraphicDisplay::begin(byte p_cs, byte p_si, byte p_clk, byte p_a0, byte 
   initialize(p_cs, p_si, p_clk, p_a0, p_res, type);
 }
 
+/*----------------------------
+Func: Arduino begin function with Hardware SPI
+Desc: Initializes SPI Hardware and DOG Displays
+Vars: Spi-Port, CS-Pin, A0-Pin (high=data, low=command), p_res = Reset-Pin, type (1=EA DOGM128-6, 2=EA DOGL128-6)
+------------------------------*/
+void DogGraphicDisplay::begin(SPIClass *port, byte p_cs, byte p_a0, byte p_res, byte type)
+{
+  byte *ptr_init; //pointer to the correct init values
+  top_view = false; //default = bottom view
+
+//  DogGraphicDisplay::spi_port = port;
+  DogGraphicDisplay::p_a0 = p_a0;
+  pinMode(p_a0, OUTPUT);
+  spi_initialize_h(port, p_cs); //init SPI to Mode 3
+
+  //perform a Reset
+  digitalWrite(p_res, LOW);
+  pinMode(p_res, OUTPUT);
+  delayMicroseconds(10);
+  digitalWrite(p_res, HIGH);
+  delay(1);
+
+  //Init DOGM displays, depending on users choice
+  ptr_init = init_DOGM128; //default pointer for wrong parameters
+  if(type == DOGM128) ptr_init = init_DOGM128;
+  else if(type == DOGL128) ptr_init = init_DOGL128;
+  else if(type == DOGM132) ptr_init = init_DOGM132;
+  else if(type == DOGS102) ptr_init = init_DOGS102;
+
+  DogGraphicDisplay::type = type;
+
+  digitalWrite(p_a0, LOW);  //init display
+  if(type == DOGS102) spi_put(ptr_init, INITLEN_DOGS102);  // shorter init for DOGS102
+  else spi_put(ptr_init, INITLEN);
+
+  clear();
+}
+
 /*-----------------------------
 Arduino end function. stop SPI if enabled and delete canvas memory area
 */
@@ -836,6 +874,7 @@ void DogGraphicDisplay::spi_initialize(byte cs, byte si, byte clk)
     hardware = true;
     p_si = MOSI;
     p_clk = SCK;
+    DogGraphicDisplay::spi_port = &SPI;
   }
   else
   {
@@ -865,6 +904,32 @@ void DogGraphicDisplay::spi_initialize(byte cs, byte si, byte clk)
     SPI.setClockDivider(SPI_CLOCK_DIV4);
 #endif /* ARDUINO_ARCH_MBED */
   }
+}
+
+/*----------------------------
+Func: spi_initialize with hardware spi
+Desc: Initializes SPI Hardware
+Vars: Port, CS-Pin
+------------------------------*/
+void DogGraphicDisplay::spi_initialize_h(SPIClass *port, byte cs)
+{
+  //Set pin Configuration
+  p_cs = cs;
+  DogGraphicDisplay::spi_port = port;
+  hardware = true;
+
+  // Set CS to deselct slaves
+  digitalWrite(p_cs, HIGH);
+  pinMode(p_cs, OUTPUT);
+
+  spi_port->begin();
+#ifdef ARDUINO_ARCH_MBED
+  spi_port->beginTransaction(SPISettings(10*1000*1000, MSBFIRST, SPI_MODE3)); /* SPI CLK = 10 MHz */
+#else
+  spi_port->setBitOrder(MSBFIRST);
+  spi_port->setDataMode(SPI_MODE3);
+  spi_port->setClockDivider(SPI_CLOCK_DIV4);
+#endif /* ARDUINO_ARCH_MBED */
 }
 
 /*----------------------------
@@ -905,7 +970,7 @@ void DogGraphicDisplay::spi_out(byte dat)
   byte i = 8;
   if(hardware)
   {
-    SPI.transfer(dat);
+    spi_port->transfer(dat);
   }
   else
   {
