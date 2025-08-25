@@ -883,7 +883,7 @@ void DogGraphicDisplay::spi_initialize(byte cs, byte si, byte clk)
     p_clk = clk;
   }
 
-  // Set CS to deselct slaves
+  // Set CS to deselect slaves
   digitalWrite(p_cs, HIGH);
   pinMode(p_cs, OUTPUT);
 
@@ -912,7 +912,7 @@ void DogGraphicDisplay::spi_initialize_h(SPIClass *port, byte cs)
   DogGraphicDisplay::spi_port = port;
   hardware = true;
 
-  // Set CS to deselct slaves
+  // Set CS to deselect slaves
   digitalWrite(p_cs, HIGH);
   pinMode(p_cs, OUTPUT);
 
